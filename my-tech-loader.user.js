@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         My Tech Script Loader
-// @namespace    https://github.com/XEYSOS132/brscript51-55
+// @namespace    https://github.com/s4loed-blip/brscript51-55
 // @version      0.1.1
 // @description  Для работы отдела 51-55
 // @author       tech51
@@ -10,15 +10,15 @@
 // @grant        unsafeWindow
 // @run-at       document-start
 // @license      MIT
-// @updateURL    https://raw.githubusercontent.com/XEYSOS132/brscript51-55/main/my-tech-loader.user.js
-// @downloadURL  https://raw.githubusercontent.com/XEYSOS132/brscript51-55/main/my-tech-loader.user.js
+// @updateURL    https://raw.githubusercontent.com/s4loed-blip/brscript51-55/main/my-tech-loader.user.js
+// @downloadURL  https://raw.githubusercontent.com/s4loed-blip/brscript51-55/main/my-tech-loader.user.js
 // ==/UserScript==
 
 (() => {
     'use strict';
 
     const CONFIG = {
-        sourceUrl: 'https://raw.githubusercontent.com/XEYSOS132/brscript51-55/main/forum-buttons51-55.js',
+        sourceUrl: 'https://raw.githubusercontent.com/s4loed-blip/brscript51-55/main/forum-buttons51-55.js',
         timeoutMs: 10000,
         retries: 3,
         retryDelayMs: 2000,
