@@ -48,11 +48,10 @@
                 try {
                     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
                     if (Array.isArray(saved)) {
-                        const valid = saved.map(Number).filter(id => SERVERS.some(s => s.id === id));
-                        return valid.length ? valid : SERVERS.map(s => s.id);
+                        return saved.map(Number).filter(id => SERVERS.some(s => s.id === id));
                     }
                 } catch (e) {}
-                return SERVERS.map(s => s.id);
+                return [];
             }
 
             function saveSelectedServers(ids) {
@@ -98,52 +97,38 @@
                 return null;
             }
 
-            function makeDropLink(text, href, color) {
+            function makeTopLink(text, href, color) {
                 const a = document.createElement('a');
-                a.className = 'br-panel-drop-link';
+                a.className = 'br-selected-server-btn';
                 a.textContent = text;
                 a.href = href;
                 a.target = '_blank';
-                a.style.borderLeft = '3px solid ' + color;
+                a.style.borderBottom = '2px solid ' + color;
                 return a;
             }
 
-            function buildDropdownContent(drop) {
-                drop.innerHTML = '';
-
+            function buildSelectedButtons() {
                 const selected = getSelectedServers();
+                const buttons = [];
 
                 selected.forEach(id => {
                     const s = SERVERS.find(server => server.id === id);
                     if (!s) return;
 
-                    const row = document.createElement('div');
-                    row.className = 'br-panel-row';
-
-                    row.appendChild(makeDropLink('ТЖБ' + id, s.techComplaint, '#0000CD'));
-                    row.appendChild(makeDropLink('Т' + id, s.tech, '#8B008B'));
-                    row.appendChild(makeDropLink('ЖБ' + id, s.playerComplaint, '#DC143C'));
-
-                    drop.appendChild(row);
+                    buttons.push(makeTopLink('ТЖБ' + id, s.techComplaint, '#0000CD'));
+                    buttons.push(makeTopLink('Т' + id, s.tech, '#8B008B'));
+                    buttons.push(makeTopLink('ЖБ' + id, s.playerComplaint, '#DC143C'));
                 });
 
-                const bottom = document.createElement('div');
-                bottom.className = 'br-panel-bottom';
+                if (selected.length > 0) {
+                    buttons.push(makeTopLink('ОПС', OPS_LINK, '#f59e0b'));
+                }
 
-                bottom.appendChild(makeDropLink('ОПС', OPS_LINK, '#f59e0b'));
-
-                const settings = document.createElement('button');
-                settings.type = 'button';
-                settings.className = 'br-panel-settings';
-                settings.textContent = '⚙ Настройки серверов';
-                settings.addEventListener('click', openSettings);
-
-                bottom.appendChild(settings);
-                drop.appendChild(bottom);
+                return buttons;
             }
 
             function removeOldPanel() {
-                document.querySelectorAll('.br-panel-item, .br-panel-wrap, .br-topnav-item, .br-topnav-wrap').forEach(el => el.remove());
+                document.querySelectorAll('.br-panel-item, .br-panel-wrap, .br-selected-server-item, .br-selected-server-wrap, .br-topnav-item, .br-topnav-wrap').forEach(el => el.remove());
             }
 
             function makePanelElement() {
@@ -158,7 +143,7 @@
                 const drop = document.createElement('div');
                 drop.className = 'br-panel-dropdown';
 
-                buildDropdownContent(drop);
+                buildServerChooser(drop);
 
                 button.addEventListener('click', (e) => {
                     e.preventDefault();
@@ -178,6 +163,43 @@
                 return holder;
             }
 
+            function buildServerChooser(drop) {
+                drop.innerHTML = '';
+
+                const title = document.createElement('div');
+                title.className = 'br-panel-title';
+                title.textContent = 'Выбери сервер';
+                drop.appendChild(title);
+
+                const selected = getSelectedServers();
+
+                SERVERS.forEach(s => {
+                    const row = document.createElement('button');
+                    row.type = 'button';
+                    row.className = 'br-panel-server-choice' + (selected.includes(s.id) ? ' selected' : '');
+                    row.textContent = `${s.name} (${s.id})`;
+
+                    row.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+
+                        let current = getSelectedServers();
+
+                        if (current.includes(s.id)) {
+                            current = current.filter(id => id !== s.id);
+                        } else {
+                            current.push(s.id);
+                        }
+
+                        current = current.sort((a, b) => a - b);
+                        saveSelectedServers(current);
+                        renderPanel();
+                    });
+
+                    drop.appendChild(row);
+                });
+            }
+
             function renderPanel() {
                 const moderLink = findModerLink();
                 if (!moderLink) return false;
@@ -188,74 +210,44 @@
                 removeOldPanel();
 
                 const panel = makePanelElement();
+                const selectedButtons = buildSelectedButtons();
 
                 if (place.type === 'list') {
-                    const li = document.createElement('li');
-                    li.className = 'p-navEl br-panel-item';
-                    li.appendChild(panel);
+                    const panelLi = document.createElement('li');
+                    panelLi.className = 'p-navEl br-panel-item';
+                    panelLi.appendChild(panel);
 
                     if (place.after && place.after.parentNode === place.menu) {
-                        place.after.after(li);
+                        place.after.after(panelLi);
                     } else {
-                        place.menu.appendChild(li);
+                        place.menu.appendChild(panelLi);
                     }
+
+                    let last = panelLi;
+
+                    selectedButtons.forEach(btn => {
+                        const li = document.createElement('li');
+                        li.className = 'p-navEl br-selected-server-item';
+                        li.appendChild(btn);
+
+                        if (last && last.parentNode === place.menu) {
+                            last.after(li);
+                        } else {
+                            place.menu.appendChild(li);
+                        }
+
+                        last = li;
+                    });
                 } else {
+                    const selectedWrap = document.createElement('span');
+                    selectedWrap.className = 'br-selected-server-wrap';
+                    selectedButtons.forEach(btn => selectedWrap.appendChild(btn));
+
                     place.after.after(panel);
+                    panel.after(selectedWrap);
                 }
 
                 return true;
-            }
-
-            function openSettings() {
-                let overlay = document.querySelector('.br-panel-modal-overlay');
-
-                if (!overlay) {
-                    overlay = document.createElement('div');
-                    overlay.className = 'br-panel-modal-overlay';
-                    overlay.innerHTML = `
-                        <div class="br-panel-modal">
-                            <div class="br-panel-modal-title">Выбор серверов</div>
-                            <div class="br-panel-modal-body"></div>
-                            <div class="br-panel-modal-footer">
-                                <button type="button" class="br-panel-cancel">Отмена</button>
-                                <button type="button" class="br-panel-save">Сохранить</button>
-                            </div>
-                        </div>
-                    `;
-                    document.body.appendChild(overlay);
-
-                    overlay.querySelector('.br-panel-cancel').onclick = () => overlay.classList.remove('show');
-
-                    overlay.querySelector('.br-panel-save').onclick = () => {
-                        const checked = Array.from(overlay.querySelectorAll('input:checked'))
-                            .map(input => Number(input.value))
-                            .sort((a, b) => a - b);
-
-                        saveSelectedServers(checked);
-                        overlay.classList.remove('show');
-                        renderPanel();
-                    };
-
-                    overlay.onclick = (e) => {
-                        if (e.target === overlay) overlay.classList.remove('show');
-                    };
-                }
-
-                const selected = getSelectedServers();
-                const body = overlay.querySelector('.br-panel-modal-body');
-                body.innerHTML = '';
-
-                SERVERS.forEach(s => {
-                    const label = document.createElement('label');
-                    label.className = 'br-panel-check';
-                    label.innerHTML = `
-                        <input type="checkbox" value="${s.id}" ${selected.includes(s.id) ? 'checked' : ''}>
-                        ${s.name} (${s.id})
-                    `;
-                    body.appendChild(label);
-                });
-
-                overlay.classList.add('show');
             }
 
             function addStyle() {
@@ -264,7 +256,8 @@
                 const style = document.createElement('style');
                 style.id = 'br-panel-style';
                 style.textContent = `
-                    .br-panel-item {
+                    .br-panel-item,
+                    .br-selected-server-item {
                         display: inline-flex !important;
                         align-items: center !important;
                         list-style: none !important;
@@ -287,7 +280,6 @@
                         background: transparent !important;
                         color: #d7d7d7 !important;
                         border: 0 !important;
-                        border-bottom: 2px solid #f59e0b !important;
                         font-family: inherit !important;
                         font-size: 13px !important;
                         font-weight: 600 !important;
@@ -306,11 +298,11 @@
                         position: absolute !important;
                         top: 100% !important;
                         left: 0 !important;
-                        width: 260px !important;
+                        width: 190px !important;
                         display: none !important;
                         flex-direction: column !important;
-                        gap: 6px !important;
-                        padding: 10px !important;
+                        gap: 5px !important;
+                        padding: 8px !important;
                         background: #1f2225 !important;
                         border: 1px solid rgba(255,255,255,0.12) !important;
                         border-radius: 0 0 8px 8px !important;
@@ -318,133 +310,86 @@
                         z-index: 2147483647 !important;
                     }
 
-                    .br-panel-wrap.open .br-panel-dropdown,
-                    .br-panel-wrap:hover .br-panel-dropdown {
+                    .br-panel-wrap.open .br-panel-dropdown {
                         display: flex !important;
                     }
 
-                    .br-panel-row {
-                        display: grid !important;
-                        grid-template-columns: repeat(3, 1fr) !important;
-                        gap: 5px !important;
+                    .br-panel-title {
+                        padding: 4px 6px 7px 6px !important;
+                        color: #aaa !important;
+                        font-size: 12px !important;
+                        font-weight: 700 !important;
+                        border-bottom: 1px solid rgba(255,255,255,0.12) !important;
+                        margin-bottom: 4px !important;
                     }
 
-                    .br-panel-bottom {
-                        display: grid !important;
-                        grid-template-columns: 1fr 1.5fr !important;
-                        gap: 5px !important;
-                        padding-top: 6px !important;
-                        border-top: 1px solid rgba(255,255,255,0.12) !important;
-                    }
-
-                    .br-panel-drop-link,
-                    .br-panel-settings {
+                    .br-panel-server-choice {
                         display: flex !important;
                         align-items: center !important;
-                        justify-content: center !important;
-                        min-height: 30px !important;
-                        padding: 0 7px !important;
+                        justify-content: flex-start !important;
+                        min-height: 29px !important;
+                        width: 100% !important;
+                        padding: 0 8px !important;
                         background: rgba(255,255,255,0.06) !important;
                         color: #ddd !important;
-                        border-top: 0 !important;
-                        border-right: 0 !important;
-                        border-bottom: 0 !important;
+                        border: 0 !important;
                         border-radius: 4px !important;
                         font-family: inherit !important;
                         font-size: 12px !important;
                         font-weight: 700 !important;
-                        text-decoration: none !important;
                         cursor: pointer !important;
-                        white-space: nowrap !important;
+                        text-align: left !important;
                     }
 
-                    .br-panel-drop-link:hover,
-                    .br-panel-settings:hover {
+                    .br-panel-server-choice:hover {
+                        background: rgba(255,255,255,0.16) !important;
+                        color: #fff !important;
+                    }
+
+                    .br-panel-server-choice.selected {
+                        background: rgba(37,99,235,0.22) !important;
+                        color: #fff !important;
+                    }
+
+                    .br-panel-server-choice.selected::before {
+                        content: '✓' !important;
+                        color: #60a5fa !important;
+                        margin-right: 6px !important;
+                    }
+
+                    .br-selected-server-wrap {
+                        display: inline-flex !important;
+                        align-items: center !important;
+                        gap: 4px !important;
+                        margin-left: 4px !important;
+                        flex-wrap: wrap !important;
+                    }
+
+                    .br-selected-server-btn {
+                        display: inline-flex !important;
+                        align-items: center !important;
+                        justify-content: center !important;
+                        min-height: 29px !important;
+                        padding: 0 7px !important;
+                        margin: 0 1px !important;
+                        border-radius: 3px !important;
+                        background: rgba(255,255,255,0.06) !important;
+                        color: #ddd !important;
+                        font-family: inherit !important;
+                        font-size: 11px !important;
+                        font-weight: 700 !important;
+                        text-decoration: none !important;
+                        white-space: nowrap !important;
+                        cursor: pointer !important;
+                        border-top: 0 !important;
+                        border-left: 0 !important;
+                        border-right: 0 !important;
+                    }
+
+                    .br-selected-server-btn:hover {
                         background: rgba(255,255,255,0.16) !important;
                         color: #fff !important;
                         text-decoration: none !important;
-                    }
-
-                    .br-panel-settings {
-                        border-left: 3px solid #f59e0b !important;
-                    }
-
-                    .br-panel-modal-overlay {
-                        position: fixed !important;
-                        inset: 0 !important;
-                        display: none !important;
-                        align-items: center !important;
-                        justify-content: center !important;
-                        background: rgba(0,0,0,0.72) !important;
-                        z-index: 2147483647 !important;
-                    }
-
-                    .br-panel-modal-overlay.show {
-                        display: flex !important;
-                    }
-
-                    .br-panel-modal {
-                        width: 340px !important;
-                        background: #181818 !important;
-                        border: 1px solid #333 !important;
-                        border-radius: 10px !important;
-                        box-shadow: 0 15px 45px rgba(0,0,0,0.75) !important;
-                        padding: 15px !important;
-                        color: #fff !important;
-                        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
-                    }
-
-                    .br-panel-modal-title {
-                        font-size: 16px !important;
-                        font-weight: 700 !important;
-                        margin-bottom: 12px !important;
-                    }
-
-                    .br-panel-modal-body {
-                        display: grid !important;
-                        grid-template-columns: repeat(2, 1fr) !important;
-                        gap: 8px !important;
-                        margin-bottom: 15px !important;
-                    }
-
-                    .br-panel-check {
-                        display: flex !important;
-                        align-items: center !important;
-                        gap: 7px !important;
-                        padding: 8px !important;
-                        border-radius: 6px !important;
-                        background: #222 !important;
-                        color: #ddd !important;
-                        cursor: pointer !important;
-                        user-select: none !important;
-                    }
-
-                    .br-panel-check input {
-                        accent-color: #2563eb !important;
-                    }
-
-                    .br-panel-modal-footer {
-                        display: flex !important;
-                        justify-content: flex-end !important;
-                        gap: 8px !important;
-                    }
-
-                    .br-panel-modal-footer button {
-                        padding: 7px 12px !important;
-                        border: none !important;
-                        border-radius: 6px !important;
-                        cursor: pointer !important;
-                        font-weight: 700 !important;
-                    }
-
-                    .br-panel-cancel {
-                        background: #333 !important;
-                        color: #ddd !important;
-                    }
-
-                    .br-panel-save {
-                        background: #2563eb !important;
-                        color: #fff !important;
                     }
                 `;
                 document.head.appendChild(style);
