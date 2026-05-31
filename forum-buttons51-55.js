@@ -1,268 +1,328 @@
 (function () {
     'use strict';
-    try {
-        (function() {
-            const STORAGE_PREFIX = 'br_panel_mix_';
+try {
+    (function () {
+        const STORAGE_KEY = 'br_topnav_51_55_servers';
 
-            // Ссылки на тех. разделы
-            const DATA_TECH = [
-                { text: 'TULA (51)', link: 'https://forum.blackrussia.online/forums/Технический-раздел-tula.2262/', color: '#8B008B' },
-                { text: 'RYAZAN (52)', link: 'https://forum.blackrussia.online/forums/Технический-раздел-ryazan.2304/', color: '#8B008B' },
-                { text: 'MURMANSK (53)', link: 'https://forum.blackrussia.online/forums/Технический-раздел-murmansk.2346/', color: '#8B008B' },
-                { text: 'PENZA (54)', link: 'https://forum.blackrussia.online/forums/Технический-раздел-penza.2388/', color: '#8B008B' },
-                { text: 'KURSK (55)', link: 'https://forum.blackrussia.online/forums/Технический-раздел-kursk.2430/', color: '#8B008B' },
-            ];
+        const DATA_TECH = [
+            { id: 51, text: 'TULA (51)', link: 'https://forum.blackrussia.online/forums/Технический-раздел-tula.2262/', color: '#8B008B' },
+            { id: 52, text: 'RYAZAN (52)', link: 'https://forum.blackrussia.online/forums/Технический-раздел-ryazan.2304/', color: '#8B008B' },
+            { id: 53, text: 'MURMANSK (53)', link: 'https://forum.blackrussia.online/forums/Технический-раздел-murmansk.2346/', color: '#8B008B' },
+            { id: 54, text: 'PENZA (54)', link: 'https://forum.blackrussia.online/forums/Технический-раздел-penza.2388/', color: '#8B008B' },
+            { id: 55, text: 'KURSK (55)', link: 'https://forum.blackrussia.online/forums/Технический-раздел-kursk.2430/', color: '#8B008B' },
+        ];
 
-            const DATA_TECH_COMPLAINT = [
-                { text: 'TULA (51)', link: 'https://forum.blackrussia.online/forums/Сервер-№51-tula.2261/', color: '#0000CD' },
-                { text: 'RYAZAN (52)', link: 'https://forum.blackrussia.online/forums/Сервер-№52-ryazan.2303/', color: '#0000CD' },
-                { text: 'MURMANSK (53)', link: 'https://forum.blackrussia.online/forums/Сервер-№53-murmansk.2345/', color: '#0000CD' },
-                { text: 'PENZA (54)', link: 'https://forum.blackrussia.online/forums/Сервер-№54-penza.2387/', color: '#0000CD' },
-                { text: 'KURSK (55)', link: 'https://forum.blackrussia.online/forums/Сервер-№55-kursk.2429/', color: '#0000CD' },
-            ];
+        const DATA_TECH_COMPLAINT = [
+            { id: 51, text: 'TULA (51)', link: 'https://forum.blackrussia.online/forums/Сервер-№51-tula.2261/', color: '#0000CD' },
+            { id: 52, text: 'RYAZAN (52)', link: 'https://forum.blackrussia.online/forums/Сервер-№52-ryazan.2303/', color: '#0000CD' },
+            { id: 53, text: 'MURMANSK (53)', link: 'https://forum.blackrussia.online/forums/Сервер-№53-murmansk.2345/', color: '#0000CD' },
+            { id: 54, text: 'PENZA (54)', link: 'https://forum.blackrussia.online/forums/Сервер-№54-penza.2387/', color: '#0000CD' },
+            { id: 55, text: 'KURSK (55)', link: 'https://forum.blackrussia.online/forums/Сервер-№55-kursk.2429/', color: '#0000CD' },
+        ];
 
-            const DATA_PLAYER_COMPLAINT = [
-                { text: 'TULA (51)', link: 'https://forum.blackrussia.online/forums/Жалобы-на-игроков.2290/', color: '#DC143C' },
-                { text: 'RYAZAN (52)', link: 'https://forum.blackrussia.online/forums/Жалобы-на-игроков.2332/', color: '#DC143C' },
-                { text: 'MURMANSK (53)', link: 'https://forum.blackrussia.online/forums/Жалобы-на-игроков.2374/', color: '#DC143C' },
-                { text: 'PENZA (54)', link: 'https://forum.blackrussia.online/forums/Жалобы-на-игроков.2416/', color: '#DC143C' },
-                { text: 'KURSK (55)', link: 'https://forum.blackrussia.online/forums/Жалобы-на-игроков.2458/', color: '#DC143C' },
-            ];
+        const DATA_PLAYER_COMPLAINT = [
+            { id: 51, text: 'TULA (51)', link: 'https://forum.blackrussia.online/forums/Жалобы-на-игроков.2290/', color: '#DC143C' },
+            { id: 52, text: 'RYAZAN (52)', link: 'https://forum.blackrussia.online/forums/Жалобы-на-игроков.2332/', color: '#DC143C' },
+            { id: 53, text: 'MURMANSK (53)', link: 'https://forum.blackrussia.online/forums/Жалобы-на-игроков.2374/', color: '#DC143C' },
+            { id: 54, text: 'PENZA (54)', link: 'https://forum.blackrussia.online/forums/Жалобы-на-игроков.2416/', color: '#DC143C' },
+            { id: 55, text: 'KURSK (55)', link: 'https://forum.blackrussia.online/forums/Жалобы-на-игроков.2458/', color: '#DC143C' },
+        ];
 
-            const OPS_LINK = { text: 'Общие Правила серверов', href: 'https://forum.blackrussia.online/threads/%D0%9E%D0%B1%D1%89%D0%B8%D0%B5-%D0%BF%D1%80%D0%B0%D0%B2%D0%B8%D0%BB%D0%B0-%D1%81%D0%B5%D1%80%D0%B2%D0%B5%D1%80%D0%BE%D0%B2.312571/', color: '#f59e0b', glow: true };
+        const OPS_LINK = {
+            text: 'ОПС',
+            link: 'https://forum.blackrussia.online/threads/%D0%9E%D0%B1%D1%89%D0%B8%D0%B5-%D0%BF%D1%80%D0%B0%D0%B2%D0%B8%D0%BB%D0%B0-%D1%81%D0%B5%D1%80%D0%B2%D0%B5%D1%80%D0%BE%D0%B2.312571/',
+            color: '#f59e0b'
+        };
 
-            const SERVER_LIST = DATA_TECH.map((item, index) => {
-                const match = item.text.match(/(.*?) \((\d+)\)/);
-                const serverNumber = match ? Number(match[2]) : index + 1;
-                return {
-                    id: serverNumber,
-                    index,
-                    name: match ? match[1] : `Server ${serverNumber}`,
-                    fullName: item.text
-                };
+        const ALL_SERVERS = [51, 52, 53, 54, 55];
+
+        function getSelectedServers() {
+            try {
+                const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+                if (Array.isArray(saved)) {
+                    const valid = saved.map(Number).filter(id => ALL_SERVERS.includes(id));
+                    return valid.length ? valid : ALL_SERVERS;
+                }
+            } catch (e) {}
+            return ALL_SERVERS;
+        }
+
+        function saveSelectedServers(ids) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(ids));
+        }
+
+        function findTopNav() {
+            return document.querySelector('.p-nav-list')
+                || document.querySelector('.p-sectionLinks-list')
+                || document.querySelector('.p-nav-scroller .hScroller-scroll')
+                || document.querySelector('.p-navgroup');
+        }
+
+        function createLink(text, href, color) {
+            const a = document.createElement('a');
+            a.className = 'br-topnav-btn';
+            a.textContent = text;
+            a.href = href;
+            a.target = '_blank';
+            a.style.borderBottom = `2px solid ${color}`;
+
+            if (window.location.href.includes(href)) {
+                a.classList.add('active');
+            }
+
+            return a;
+        }
+
+        function createSettingsButton() {
+            const btn = document.createElement('button');
+            btn.className = 'br-topnav-btn br-topnav-settings';
+            btn.type = 'button';
+            btn.textContent = '⚙';
+            btn.title = 'Выбор серверов';
+            btn.onclick = openSettings;
+            return btn;
+        }
+
+        function renderTopButtons() {
+            if (document.querySelector('.br-topnav-wrap')) return;
+
+            const nav = findTopNav();
+            if (!nav) return;
+
+            const selected = getSelectedServers();
+
+            const holder = document.createElement('div');
+            holder.className = 'br-topnav-wrap';
+
+            selected.forEach(serverId => {
+                const techComplaint = DATA_TECH_COMPLAINT.find(x => x.id === serverId);
+                const tech = DATA_TECH.find(x => x.id === serverId);
+                const playerComplaint = DATA_PLAYER_COMPLAINT.find(x => x.id === serverId);
+
+                if (techComplaint) {
+                    holder.appendChild(createLink(`ТЖБ${serverId}`, techComplaint.link, techComplaint.color));
+                }
+
+                if (tech) {
+                    holder.appendChild(createLink(`Т${serverId}`, tech.link, tech.color));
+                }
+
+                if (playerComplaint) {
+                    holder.appendChild(createLink(`ЖБ${serverId}`, playerComplaint.link, playerComplaint.color));
+                }
             });
 
-            function getSelected() {
-                const defaultServers = [51, 52, 53, 54, 55];
-                const saved = localStorage.getItem(STORAGE_PREFIX + 'servers');
-                if (!saved) return defaultServers;
+            holder.appendChild(createLink(OPS_LINK.text, OPS_LINK.link, OPS_LINK.color));
+            holder.appendChild(createSettingsButton());
 
-                try {
-                    const parsed = JSON.parse(saved).map(Number);
-                    const valid = parsed.filter(id => SERVER_LIST.some(srv => srv.id === id));
-                    return valid.length ? valid : defaultServers;
-                } catch (e) {
-                    return defaultServers;
-                }
+            if (nav.tagName === 'UL') {
+                const li = document.createElement('li');
+                li.className = 'p-navEl br-topnav-li';
+                li.appendChild(holder);
+                nav.appendChild(li);
+            } else {
+                nav.appendChild(holder);
             }
+        }
 
-            function renderMenu() {
-                const menu = document.querySelector('.fnp-menu');
-                if(!menu) return;
+        function openSettings() {
+            let overlay = document.querySelector('.br-topnav-modal-overlay');
 
-                menu.innerHTML = '';
-                const selectedIds = getSelected();
-
-                if (selectedIds.length === 0) {
-                    const emptyMsg = document.createElement('div');
-                    emptyMsg.style.cssText = 'color:#888; text-align:center; padding:10px; font-size:12px;';
-                    emptyMsg.textContent = 'Серверы не выбраны. Нажмите настройки.';
-                    menu.appendChild(emptyMsg);
-                } else {
-                    const createBtn = (dataArray, serverId, label) => {
-                        const server = SERVER_LIST.find(srv => srv.id === serverId);
-                        const item = server ? dataArray[server.index] : null;
-                        if (!item) return null;
-                        const a = document.createElement('a');
-                        a.className = 'fnp-link';
-                        if (window.location.href.includes(item.link)) a.classList.add('active-page');
-                        a.href = item.link; a.textContent = label; a.target = '_blank';
-                        a.style.borderBottom = `2px solid ${item.color}`;
-                        a.addEventListener('pointerdown', e => e.stopPropagation());
-                        return a;
-                    };
-
-                    const addGroup = (data, labelPrefix) => {
-                        const group = document.createElement('div');
-                        group.className = 'fnp-grid';
-                        selectedIds.forEach(id => {
-                            const btn = createBtn(data, id, labelPrefix + id);
-                            if(btn) group.appendChild(btn);
-                        });
-                        menu.appendChild(group);
-                    };
-
-                    addGroup(DATA_TECH_COMPLAINT, 'тЖБ');
-                    menu.appendChild(Object.assign(document.createElement('div'), {className:'fnp-divider'}));
-                    addGroup(DATA_TECH, 'Тех');
-                    menu.appendChild(Object.assign(document.createElement('div'), {className:'fnp-divider'}));
-                    addGroup(DATA_PLAYER_COMPLAINT, 'Ж');
-                    menu.appendChild(Object.assign(document.createElement('div'), {className:'fnp-divider'}));
-
-                    const ops = document.createElement('a');
-                    ops.className = 'fnp-link glow';
-                    ops.href = OPS_LINK.href; ops.textContent = OPS_LINK.text; ops.target = '_blank';
-                    ops.style.borderBottom = `2px solid ${OPS_LINK.color}`;
-                    ops.addEventListener('pointerdown', e => e.stopPropagation());
-                    menu.appendChild(ops);
-                }
-
-                const settingsBtn = document.createElement('div');
-                settingsBtn.className = 'fnp-settings-btn';
-                settingsBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>`;
-                settingsBtn.addEventListener('click', (e) => { e.stopPropagation(); openSettings(); });
-                menu.appendChild(settingsBtn);
-            }
-
-            function openSettings() {
-                const menu = document.querySelector('.fnp-menu');
-                const toggleBtn = document.querySelector('.fnp-toggle');
-                if(menu) menu.classList.remove('show');
-                if(toggleBtn) toggleBtn.classList.remove('active');
-                localStorage.setItem(STORAGE_PREFIX + 'state', 'false');
-
-                let overlay = document.querySelector('.fnp-modal-overlay');
-                if(!overlay) {
-                    overlay = document.createElement('div'); overlay.className = 'fnp-modal-overlay';
-                    overlay.innerHTML = `
-                        <div class="fnp-modal">
-                            <div class="fnp-modal-header">Выбор серверов</div>
-                            <div class="fnp-modal-body"></div>
-                            <div class="fnp-modal-footer">
-                                <button class="fnp-btn fnp-btn-secondary" id="fnp-cancel">Отмена</button>
-                                <button class="fnp-btn fnp-btn-primary" id="fnp-save">Сохранить</button>
-                            </div>
+            if (!overlay) {
+                overlay = document.createElement('div');
+                overlay.className = 'br-topnav-modal-overlay';
+                overlay.innerHTML = `
+                    <div class="br-topnav-modal">
+                        <div class="br-topnav-modal-title">Выбор серверов</div>
+                        <div class="br-topnav-modal-body"></div>
+                        <div class="br-topnav-modal-footer">
+                            <button type="button" class="br-topnav-cancel">Отмена</button>
+                            <button type="button" class="br-topnav-save">Сохранить</button>
                         </div>
-                    `;
-                    document.body.appendChild(overlay);
+                    </div>
+                `;
+                document.body.appendChild(overlay);
 
-                    overlay.querySelector('#fnp-cancel').onclick = () => overlay.classList.remove('open');
-                    overlay.querySelector('#fnp-save').onclick = () => {
-                        const checked = Array.from(overlay.querySelectorAll('input:checked')).map(el => +el.value).sort((a,b)=>a-b);
-                        localStorage.setItem(STORAGE_PREFIX + 'servers', JSON.stringify(checked));
-                        renderMenu();
-                        overlay.classList.remove('open');
-                    };
-                }
+                overlay.querySelector('.br-topnav-cancel').onclick = () => {
+                    overlay.classList.remove('show');
+                };
 
-                const body = overlay.querySelector('.fnp-modal-body');
-                body.innerHTML = '';
-                const current = getSelected();
-                SERVER_LIST.forEach(srv => {
-                    const lbl = document.createElement('label');
-                    lbl.className = 'fnp-checkbox-label ' + (current.includes(srv.id) ? 'checked' : '');
-                    lbl.innerHTML = `<input type="checkbox" value="${srv.id}" ${current.includes(srv.id)?'checked':''}> ${srv.name}`;
-                    lbl.querySelector('input').onchange = function() {
-                        this.parentElement.classList.toggle('checked', this.checked);
-                    };
-                    body.appendChild(lbl);
-                });
+                overlay.querySelector('.br-topnav-save').onclick = () => {
+                    const checked = Array.from(overlay.querySelectorAll('input:checked'))
+                        .map(input => Number(input.value))
+                        .sort((a, b) => a - b);
 
-                setTimeout(() => overlay.classList.add('open'), 10);
+                    saveSelectedServers(checked);
+
+                    const old = document.querySelector('.br-topnav-li') || document.querySelector('.br-topnav-wrap');
+                    if (old) old.remove();
+
+                    renderTopButtons();
+                    overlay.classList.remove('show');
+                };
+
+                overlay.onclick = (e) => {
+                    if (e.target === overlay) overlay.classList.remove('show');
+                };
             }
 
-            const style = document.createElement('style');
-            style.textContent = `
-                :root { --fnp-btn: 48px; }
-                .fnp-wrapper { position: fixed; top: 0; left: 0; width: 0; height: 0; z-index: 2147483647; }
-                .fnp-toggle { position: fixed; width: var(--fnp-btn); height: var(--fnp-btn); background: #151515; border: 1px solid rgba(255,255,255,0.2); border-radius: 50%; box-shadow: 0 6px 25px rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; color: #fff; cursor: grab; touch-action: none; user-select: none; transition: transform 0.2s; }
-                .fnp-toggle:active { transform: scale(0.9); cursor: grabbing; }
-                .fnp-toggle.active { background: #2563eb; border-color: #3b82f6; }
-                .fnp-toggle.active svg { transform: rotate(45deg); }
-                .fnp-menu { position: fixed; background: rgba(20, 20, 20, 0.95); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.12); border-radius: 16px; padding: 10px; display: flex; flex-direction: column; gap: 5px; width: 300px; max-height: 70vh; overflow-y: auto; opacity: 0; visibility: hidden; transform: scale(0.9); transition: opacity 0.2s, transform 0.2s, visibility 0.2s; pointer-events: none; box-shadow: 0 10px 40px rgba(0,0,0,0.6); }
-                .fnp-menu.show { opacity: 1; visibility: visible; transform: scale(1); pointer-events: auto; }
-                .fnp-menu::-webkit-scrollbar { width: 4px; }
-                .fnp-menu::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 2px; }
-                .fnp-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; }
-                .fnp-link { display: flex; align-items: center; justify-content: center; padding: 6px 2px; font-family: system-ui, -apple-system, sans-serif; font-size: 10px; font-weight: 700; color: #e5e5e5; text-decoration: none; background: rgba(255,255,255,0.05); border-radius: 6px; border: 1px solid transparent; transition: background 0.1s; white-space: nowrap; }
-                .fnp-link:active { background: rgba(255,255,255,0.2); transform: translateY(1px); }
-                .fnp-link.active-page { background: rgba(255,255,255,0.2); color: #fff; border-color: rgba(255,255,255,0.3); }
-                .fnp-link.glow { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border-color: rgba(245, 158, 11, 0.3); }
-                .fnp-divider { height: 1px; background: rgba(255,255,255,0.15); margin: 4px 0; width: 100%; }
-                .fnp-settings-btn { width: 100%; padding: 8px; margin-top: 5px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #aaa; cursor: pointer; display: flex; justify-content: center; align-items: center; }
-                .fnp-settings-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
-                .fnp-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2147483648; display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: 0.3s; }
-                .fnp-modal-overlay.open { opacity: 1; visibility: visible; }
-                .fnp-modal { background: #1a1a1a; border: 1px solid #333; border-radius: 12px; width: 90%; max-width: 500px; max-height: 85vh; display: flex; flex-direction: column; box-shadow: 0 20px 50px rgba(0,0,0,0.8); }
-                .fnp-modal-header { padding: 15px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; color: #fff; font-weight: bold; }
-                .fnp-modal-body { padding: 15px; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 8px; }
-                .fnp-modal-footer { padding: 15px; border-top: 1px solid #333; display: flex; justify-content: flex-end; gap: 10px; }
-                .fnp-checkbox-label { display: flex; align-items: center; gap: 8px; background: #222; padding: 6px; border-radius: 6px; cursor: pointer; user-select: none; color: #ccc; font-size: 12px; border: 1px solid #333; }
-                .fnp-checkbox-label:hover { background: #2a2a2a; }
-                .fnp-checkbox-label input { accent-color: #2563eb; }
-                .fnp-checkbox-label.checked { border-color: #2563eb; background: rgba(37, 99, 235, 0.1); color: #fff; }
-                .fnp-btn { padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer; font-weight: bold; transition: 0.2s; }
-                .fnp-btn-primary { background: #2563eb; color: #fff; }
-                .fnp-btn-primary:hover { background: #1d4ed8; }
-                .fnp-btn-secondary { background: #333; color: #ccc; }
-                .fnp-btn-secondary:hover { background: #444; color: #fff; }
-            `;
-            document.head.appendChild(style);
+            const body = overlay.querySelector('.br-topnav-modal-body');
+            const selected = getSelectedServers();
+            body.innerHTML = '';
 
-            const wrapper = document.createElement('div');
-            wrapper.className = 'fnp-wrapper';
-            const toggleBtn = document.createElement('div');
-            toggleBtn.className = 'fnp-toggle';
-            toggleBtn.innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>`;
-            const menu = document.createElement('div');
-            menu.className = 'fnp-menu';
-            wrapper.appendChild(menu);
-            wrapper.appendChild(toggleBtn);
-            document.body.appendChild(wrapper);
-
-            let savedPos = localStorage.getItem(STORAGE_PREFIX + 'pos');
-            let pos = savedPos ? JSON.parse(savedPos) : {x: window.innerWidth - 60, y: window.innerHeight * 0.6};
-            let isDragging = false;
-
-            const updatePos = (x, y) => {
-                pos.x = Math.min(Math.max(0, x), window.innerWidth - 50);
-                pos.y = Math.min(Math.max(0, y), window.innerHeight - 50);
-                toggleBtn.style.left = pos.x + 'px';
-                toggleBtn.style.top = pos.y + 'px';
-
-                const rect = toggleBtn.getBoundingClientRect();
-                menu.style.left = (rect.right + 310 > window.innerWidth ? rect.left - 310 : rect.right + 10) + 'px';
-                menu.style.top = (rect.bottom + 300 > window.innerHeight ? rect.top - 300 : rect.top) + 'px';
-            };
-
-            toggleBtn.addEventListener('pointerdown', (e) => {
-                isDragging = true;
-                toggleBtn.setPointerCapture(e.pointerId);
-                toggleBtn.style.transition = 'none';
+            ALL_SERVERS.forEach(id => {
+                const label = document.createElement('label');
+                label.className = 'br-topnav-check';
+                label.innerHTML = `
+                    <input type="checkbox" value="${id}" ${selected.includes(id) ? 'checked' : ''}>
+                    Сервер ${id}
+                `;
+                body.appendChild(label);
             });
 
-            toggleBtn.addEventListener('pointermove', (e) => {
-                if(!isDragging) return;
-                updatePos(e.clientX - 24, e.clientY - 24);
-            });
+            overlay.classList.add('show');
+        }
 
-            toggleBtn.addEventListener('pointerup', (e) => {
-                isDragging = false;
-                toggleBtn.releasePointerCapture(e.pointerId);
-                toggleBtn.style.transition = 'all 0.3s';
-                pos.x = pos.x < window.innerWidth/2 ? 10 : window.innerWidth - 60;
-                updatePos(pos.x, pos.y);
-                localStorage.setItem(STORAGE_PREFIX + 'pos', JSON.stringify(pos));
-
-                if(Math.abs(e.clientX - 24 - pos.x) < 10) {
-                    const show = menu.classList.toggle('show');
-                    toggleBtn.classList.toggle('active', show);
-                    localStorage.setItem(STORAGE_PREFIX + 'state', show);
-                    if(show) updatePos(pos.x, pos.y);
-                }
-            });
-
-            updatePos(pos.x, pos.y);
-            renderMenu();
-            if(localStorage.getItem(STORAGE_PREFIX + 'state') === 'true') {
-                menu.classList.add('show');
-                toggleBtn.classList.add('active');
+        const style = document.createElement('style');
+        style.textContent = `
+            .br-topnav-li {
+                display: flex !important;
+                align-items: center !important;
             }
 
-        })();
-    } catch (e) { console.error('[BR Script] Panel Error:', e); }
+            .br-topnav-wrap {
+                display: flex !important;
+                align-items: center !important;
+                gap: 6px !important;
+                margin-left: 10px !important;
+                flex-wrap: wrap !important;
+            }
 
+            .br-topnav-btn {
+                display: inline-flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                min-height: 28px !important;
+                padding: 0 9px !important;
+                border-radius: 4px !important;
+                background: rgba(255, 255, 255, 0.06) !important;
+                color: #d7d7d7 !important;
+                font-size: 12px !important;
+                font-weight: 700 !important;
+                text-decoration: none !important;
+                border-top: 0 !important;
+                border-left: 0 !important;
+                border-right: 0 !important;
+                cursor: pointer !important;
+                white-space: nowrap !important;
+                transition: 0.15s !important;
+            }
 
+            .br-topnav-btn:hover,
+            .br-topnav-btn.active {
+                background: rgba(255, 255, 255, 0.16) !important;
+                color: #ffffff !important;
+            }
+
+            .br-topnav-settings {
+                border: none !important;
+                background: rgba(245, 158, 11, 0.18) !important;
+                color: #fbbf24 !important;
+            }
+
+            .br-topnav-modal-overlay {
+                position: fixed !important;
+                inset: 0 !important;
+                display: none !important;
+                align-items: center !important;
+                justify-content: center !important;
+                background: rgba(0, 0, 0, 0.7) !important;
+                z-index: 2147483647 !important;
+            }
+
+            .br-topnav-modal-overlay.show {
+                display: flex !important;
+            }
+
+            .br-topnav-modal {
+                width: 320px !important;
+                background: #181818 !important;
+                border: 1px solid #333 !important;
+                border-radius: 10px !important;
+                box-shadow: 0 15px 45px rgba(0,0,0,0.7) !important;
+                padding: 15px !important;
+                color: #fff !important;
+                font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+            }
+
+            .br-topnav-modal-title {
+                font-size: 16px !important;
+                font-weight: 700 !important;
+                margin-bottom: 12px !important;
+            }
+
+            .br-topnav-modal-body {
+                display: grid !important;
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 8px !important;
+                margin-bottom: 15px !important;
+            }
+
+            .br-topnav-check {
+                display: flex !important;
+                align-items: center !important;
+                gap: 7px !important;
+                padding: 7px !important;
+                border-radius: 6px !important;
+                background: #222 !important;
+                color: #ddd !important;
+                cursor: pointer !important;
+                user-select: none !important;
+            }
+
+            .br-topnav-check input {
+                accent-color: #2563eb !important;
+            }
+
+            .br-topnav-modal-footer {
+                display: flex !important;
+                justify-content: flex-end !important;
+                gap: 8px !important;
+            }
+
+            .br-topnav-modal-footer button {
+                padding: 7px 12px !important;
+                border: none !important;
+                border-radius: 6px !important;
+                cursor: pointer !important;
+                font-weight: 700 !important;
+            }
+
+            .br-topnav-cancel {
+                background: #333 !important;
+                color: #ddd !important;
+            }
+
+            .br-topnav-save {
+                background: #2563eb !important;
+                color: #fff !important;
+            }
+        `;
+        document.head.appendChild(style);
+
+        const waitNav = setInterval(() => {
+            const nav = findTopNav();
+            if (nav) {
+                clearInterval(waitNav);
+                renderTopButtons();
+            }
+        }, 300);
+
+        setTimeout(() => clearInterval(waitNav), 10000);
+    })();
+} catch (e) {
+    console.error('[BR Script] Top Nav Error:', e);
+}
 	if (document.body.dataset.forumButtonsLoaded) return;
     document.body.dataset.forumButtonsLoaded = 'true';
 	const UNACCEPT_PREFIX = 4; // префикс отказано
