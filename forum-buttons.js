@@ -1,7 +1,8 @@
 (function () {
     'use strict';
 
-    const BR_SCRIPT_VERSION = '2026-06-10-fix-8';
+    const BR_SCRIPT_VERSION = '2026-06-10-fix-9';
+    const BR_SCRIPT_BUILD_ID = 'br-build-2026-06-10-layout-panel-notice-v9';
     const BR_SCRIPT_UPDATE_KEY = 'br_script_seen_update_version';
     const BR_SCRIPT_DOWNLOAD_URL = 'https://raw.githubusercontent.com/s4loed-blip/brscript51-55/main/my-tech-loader.user.js';
 
@@ -100,60 +101,90 @@
         try {
             if (localStorage.getItem(BR_SCRIPT_UPDATE_KEY) === BR_SCRIPT_VERSION) return;
 
-            setTimeout(() => {
+            const renderNotice = () => {
+                if (!document.body) return;
                 if (localStorage.getItem(BR_SCRIPT_UPDATE_KEY) === BR_SCRIPT_VERSION) return;
 
                 const old = document.querySelector('#br-script-update-notice');
                 if (old) old.remove();
 
-                const box = document.createElement('div');
-                box.id = 'br-script-update-notice';
-                box.innerHTML = `
-                    <div style="font-size: 16px; font-weight: 800; margin-bottom: 8px; color: #fff;">Обновление BR Script</div>
-                    <div style="font-size: 13px; line-height: 1.45; color: #e5e7eb;">
-                        Что изменено:<br>
-                        • Исправлено отображение кнопок в одну строку<br>
-                        • Исправлен баг с попаданием кнопок в блок «Недавно»<br>
-                        • Блок «Недавно» скрывается сразу при загрузке страницы<br>
-                        • Кнопки статусов вынесены в отдельную ровную строку под редактором<br><br>
-                        Версия: <b>${BR_SCRIPT_VERSION}</b><br><br>
-                        Нажми <b>«Скачать обновление»</b>. После этого окно больше не появится до следующей версии.
-                    </div>
-                    <div style="display: flex; gap: 8px; margin-top: 12px;">
-                        <button id="br-script-update-download" type="button" style="padding: 8px 12px; border: 0; border-radius: 8px; background: #ff4500; color: #fff; font-weight: 800; cursor: pointer;">Скачать обновление</button>
-                        <button id="br-script-update-later" type="button" style="padding: 8px 12px; border: 1px solid rgba(255,255,255,.18); border-radius: 8px; background: transparent; color: #ddd; font-weight: 700; cursor: pointer;">Позже</button>
+                const oldStyle = document.querySelector('#br-update-style');
+                if (oldStyle) oldStyle.remove();
+
+                const style = document.createElement('style');
+                style.id = 'br-update-style';
+                style.textContent = `
+                    #br-script-update-notice{position:fixed!important;inset:0!important;display:flex!important;align-items:center!important;justify-content:center!important;background:rgba(0,0,0,.46)!important;backdrop-filter:blur(3px)!important;z-index:2147483647!important;font-family:Arial,sans-serif!important}
+                    #br-script-update-notice .br-update-card{position:relative!important;width:440px!important;max-width:calc(100vw - 28px)!important;padding:18px!important;border-radius:18px!important;background:linear-gradient(145deg,#252a31 0%,#171a1f 100%)!important;border:1px solid rgba(255,255,255,.12)!important;box-shadow:0 24px 70px rgba(0,0,0,.75),0 0 0 1px rgba(255,69,0,.18) inset!important;color:#fff!important;overflow:hidden!important}
+                    #br-script-update-notice .br-update-card:before{content:''!important;position:absolute!important;left:-80px!important;top:-80px!important;width:220px!important;height:220px!important;background:radial-gradient(circle,rgba(255,69,0,.42),transparent 65%)!important;pointer-events:none!important}
+                    #br-script-update-notice .br-update-close{position:absolute!important;right:12px!important;top:10px!important;width:30px!important;height:30px!important;border-radius:10px!important;border:1px solid rgba(255,255,255,.16)!important;background:rgba(255,255,255,.06)!important;color:#fff!important;font-size:21px!important;line-height:25px!important;cursor:pointer!important}
+                    #br-script-update-notice .br-update-head{position:relative!important;display:flex!important;gap:12px!important;align-items:center!important;margin-bottom:16px!important}
+                    #br-script-update-notice .br-update-icon{width:46px!important;height:46px!important;display:flex!important;align-items:center!important;justify-content:center!important;border-radius:15px!important;background:linear-gradient(135deg,#ff4500,#f59e0b)!important;box-shadow:0 0 24px rgba(255,69,0,.45)!important;font-size:24px!important}
+                    #br-script-update-notice .br-update-title{font-size:20px!important;line-height:1.15!important;font-weight:900!important;letter-spacing:.2px!important}
+                    #br-script-update-notice .br-update-subtitle{margin-top:3px!important;font-size:12px!important;color:#b8c0cc!important;font-weight:700!important}
+                    #br-script-update-notice .br-update-body{position:relative!important;padding:13px!important;border-radius:14px!important;background:rgba(255,255,255,.055)!important;border:1px solid rgba(255,255,255,.08)!important}
+                    #br-script-update-notice .br-update-badge{display:inline-flex!important;padding:4px 9px!important;margin-bottom:9px!important;border-radius:999px!important;background:rgba(34,197,94,.15)!important;color:#86efac!important;border:1px solid rgba(34,197,94,.28)!important;font-size:11px!important;font-weight:900!important;text-transform:uppercase!important}
+                    #br-script-update-notice .br-update-list{display:grid!important;gap:7px!important;font-size:13px!important;line-height:1.35!important;color:#e5e7eb!important;font-weight:700!important}
+                    #br-script-update-notice .br-update-list span{color:#22c55e!important;font-weight:900!important;margin-right:6px!important}
+                    #br-script-update-notice .br-update-actions{display:flex!important;gap:9px!important;margin-top:15px!important}
+                    #br-script-update-notice .br-update-download,#br-script-update-notice .br-update-later{height:38px!important;padding:0 14px!important;border-radius:12px!important;font-weight:900!important;cursor:pointer!important}
+                    #br-script-update-notice .br-update-download{flex:1!important;border:0!important;color:#fff!important;background:linear-gradient(135deg,#ff4500,#f97316)!important;box-shadow:0 10px 25px rgba(255,69,0,.25)!important}
+                    #br-script-update-notice .br-update-later{border:1px solid rgba(255,255,255,.16)!important;background:rgba(255,255,255,.06)!important;color:#d1d5db!important}
+                    #br-script-update-notice .br-update-footer{margin-top:10px!important;color:#9ca3af!important;font-size:11px!important;font-weight:700!important;text-align:center!important}
+                `;
+                document.head.appendChild(style);
+
+                const overlay = document.createElement('div');
+                overlay.id = 'br-script-update-notice';
+                overlay.innerHTML = `
+                    <div class="br-update-card">
+                        <button class="br-update-close" type="button" title="Закрыть">×</button>
+                        <div class="br-update-head">
+                            <div class="br-update-icon">⚡</div>
+                            <div>
+                                <div class="br-update-title">BR Script обновлён</div>
+                                <div class="br-update-subtitle">Новая сборка готова к установке</div>
+                            </div>
+                        </div>
+                        <div class="br-update-body">
+                            <div class="br-update-badge">Что изменилось</div>
+                            <div class="br-update-list">
+                                <div><span>✓</span> Кнопки статусов выровнены нормальной строкой</div>
+                                <div><span>✓</span> Блок «Недавно» больше не мешает под формой ответа</div>
+                                <div><span>✓</span> Панель управления восстанавливается после обновления/перерисовки страницы</div>
+                                <div><span>✓</span> Окно обновления не появляется после скачивания до следующей версии</div>
+                            </div>
+                        </div>
+                        <div class="br-update-actions">
+                            <button id="br-script-update-download" class="br-update-download" type="button">Скачать обновление</button>
+                            <button id="br-script-update-later" class="br-update-later" type="button">Позже</button>
+                        </div>
+                        <div class="br-update-footer">После скачивания это окно скроется до следующей обновы.</div>
                     </div>
                 `;
-                box.style.cssText = [
-                    'position: fixed',
-                    'right: 18px',
-                    'bottom: 18px',
-                    'width: 360px',
-                    'padding: 15px',
-                    'background: #202327',
-                    'border: 2px solid #ff4500',
-                    'border-radius: 12px',
-                    'box-shadow: 0 12px 35px rgba(0,0,0,.65)',
-                    'z-index: 2147483647',
-                    'font-family: Arial, sans-serif'
-                ].join(';') + ';';
+                document.body.appendChild(overlay);
 
-                document.body.appendChild(box);
+                const closeOnly = () => overlay.remove();
+                const markDownloaded = () => {
+                    localStorage.setItem(BR_SCRIPT_UPDATE_KEY, BR_SCRIPT_VERSION);
+                    window.open(BR_SCRIPT_DOWNLOAD_URL + '?v=' + encodeURIComponent(BR_SCRIPT_VERSION) + '&b=' + encodeURIComponent(BR_SCRIPT_BUILD_ID), '_blank');
+                    overlay.remove();
+                };
 
-                const download = document.querySelector('#br-script-update-download');
-                if (download) {
-                    download.addEventListener('click', () => {
-                        localStorage.setItem(BR_SCRIPT_UPDATE_KEY, BR_SCRIPT_VERSION);
-                        window.open(BR_SCRIPT_DOWNLOAD_URL + '?v=' + encodeURIComponent(BR_SCRIPT_VERSION), '_blank');
-                        box.remove();
-                    });
-                }
+                const download = overlay.querySelector('#br-script-update-download');
+                const later = overlay.querySelector('#br-script-update-later');
+                const close = overlay.querySelector('.br-update-close');
 
-                const later = document.querySelector('#br-script-update-later');
-                if (later) {
-                    later.addEventListener('click', () => box.remove());
-                }
-            }, 1200);
+                if (download) download.addEventListener('click', markDownloaded);
+                if (later) later.addEventListener('click', closeOnly);
+                if (close) close.addEventListener('click', closeOnly);
+            };
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', () => setTimeout(renderNotice, 800), { once: true });
+            } else {
+                setTimeout(renderNotice, 800);
+            }
         } catch (e) {
             console.error('[BR Script] Update notice error:', e);
         }
@@ -765,14 +796,38 @@
                 addStyle();
                 hideInterferingNavButtons();
 
+                const ensurePanelAlive = () => {
+                    try {
+                        hideInterferingNavButtons();
+
+                        const hasPanel = !!document.querySelector('.br-panel-main');
+                        const hasSelectedButtons = !!document.querySelector('.br-selected-server-btn');
+                        const needSelectedButtons = getSelectedServers().length > 0;
+
+                        if (!hasPanel || (needSelectedButtons && !hasSelectedButtons)) {
+                            renderPanel();
+                        }
+                    } catch (e) {
+                        console.error('[BR Script] Panel alive error:', e);
+                    }
+                };
+
                 let tries = 0;
                 const timer = setInterval(() => {
                     tries += 1;
+                    ensurePanelAlive();
 
-                    if (renderPanel() || tries >= 80) {
+                    if (document.querySelector('.br-panel-main') || tries >= 120) {
                         clearInterval(timer);
                     }
-                }, 250);
+                }, 150);
+
+                setInterval(ensurePanelAlive, 1200);
+
+                try {
+                    const observer = new MutationObserver(() => ensurePanelAlive());
+                    observer.observe(document.body || document.documentElement, { childList: true, subtree: true });
+                } catch (e) {}
             }
 
             if (document.readyState === 'loading') {
