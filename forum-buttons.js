@@ -1,24 +1,44 @@
 (function () {
     'use strict';
 
-    const BR_SCRIPT_VERSION = '2026-06-10-fix-3';
+    const BR_SCRIPT_VERSION = '2026-06-10-fix-4';
 
     function showScriptUpdateNotice() {
         try {
             setTimeout(() => {
-                const message =
-                    'Обновление BR Script\n\n' +
-                    'Что изменено:\n' +
-                    '• Исправлено отображение кнопок в одну строку\n' +
-                    '• Исправлен баг с попаданием кнопок в блок "Недавно"\n' +
-                    '• Блок "Недавно" теперь скрывается под формой ответа\n\n' +
-                    'Версия: ' + BR_SCRIPT_VERSION;
+                const old = document.querySelector('#br-script-update-notice');
+                if (old) old.remove();
 
-                if (window.XF && typeof XF.alert === 'function') {
-                    XF.alert(message.replace(/\n/g, '<br>'), 'Обновление BR Script');
-                } else {
-                    alert(message);
-                }
+                const box = document.createElement('div');
+                box.id = 'br-script-update-notice';
+                box.innerHTML = `
+                    <div style="font-size: 16px; font-weight: 800; margin-bottom: 8px; color: #fff;">Обновление BR Script</div>
+                    <div style="font-size: 13px; line-height: 1.45; color: #e5e7eb;">
+                        Исправлены кнопки под ответом:<br>
+                        • одна нормальная строка;<br>
+                        • кнопки больше не падают в «Недавно»;<br>
+                        • блок «Недавно» принудительно скрывается.<br><br>
+                        Версия: <b>${BR_SCRIPT_VERSION}</b>
+                    </div>
+                    <button id="br-script-update-close" type="button" style="margin-top: 12px; padding: 7px 13px; border: 0; border-radius: 8px; background: #ff4500; color: #fff; font-weight: 800; cursor: pointer;">Понял</button>
+                `;
+                box.style.cssText = [
+                    'position: fixed',
+                    'right: 18px',
+                    'bottom: 18px',
+                    'width: 330px',
+                    'padding: 15px',
+                    'background: #202327',
+                    'border: 2px solid #ff4500',
+                    'border-radius: 12px',
+                    'box-shadow: 0 12px 35px rgba(0,0,0,.65)',
+                    'z-index: 2147483647',
+                    'font-family: Arial, sans-serif'
+                ].join(';') + ';';
+
+                document.body.appendChild(box);
+                const close = document.querySelector('#br-script-update-close');
+                if (close) close.addEventListener('click', () => box.remove());
             }, 1200);
         } catch (e) {
             console.error('[BR Script] Update notice error:', e);
@@ -1319,6 +1339,8 @@
     hideRecentAnswerRow();
     setTimeout(hideRecentAnswerRow, 800);
     setTimeout(hideRecentAnswerRow, 2000);
+    setTimeout(hideRecentAnswerRow, 4000);
+    setInterval(hideRecentAnswerRow, 3000);
 
     // Фикс расположения кнопок: одна строка + не вставлять в блок "Недавно"
     if (!document.querySelector('#br-status-buttons-fix')) {
@@ -1423,28 +1445,58 @@
 
     function hideRecentAnswerRow() {
         try {
-            $('body *').each(function () {
-                const el = this;
-                const $el = $(el);
+            const isVisible = (el) => {
+                if (!el) return false;
+                const r = el.getBoundingClientRect();
+                return r.width > 0 && r.height > 0;
+            };
 
-                if ($el.closest('.br-status-line, .br-status-buttons, .fr-box, .fr-toolbar, .fr-element, .fr-wrapper').length) return;
+            const getText = (el) => String(el && (el.innerText || el.textContent) || '').replace(/\s+/g, ' ').trim().toLowerCase();
 
-                const ownText = String(el.textContent || '').replace(/\s+/g, ' ').trim().toLowerCase();
-                if (!ownText.includes('недавно')) return;
+            const labels = Array.from(document.querySelectorAll('div, span, button, a')).filter(el => {
+                if (!isVisible(el)) return false;
+                if (el.closest('.br-status-line, .br-status-buttons, .fr-box, .fr-toolbar, .fr-element, .fr-wrapper, #br-script-update-notice')) return false;
 
-                const hasQuickAnswer = ownText.includes('переношу') || ownText.includes('вашу тему') || ownText.includes('ответы') || ownText.includes('быстрые ответы');
-                if (!hasQuickAnswer) return;
+                const own = Array.from(el.childNodes)
+                    .filter(n => n.nodeType === Node.TEXT_NODE)
+                    .map(n => n.textContent)
+                    .join(' ')
+                    .replace(/\s+/g, ' ')
+                    .trim()
+                    .toLowerCase();
 
-                const row = $el.closest('.formButtonGroup, .block-row, .message-responseRow, .message-cell, .js-quickReply, div').first();
-                if (row.length && !row.hasClass('br-status-line')) {
-                    row.addClass('br-force-hide-recent');
+                return own.includes('недавно');
+            });
+
+            labels.forEach(label => {
+                let row = label.parentElement;
+                let best = null;
+
+                while (row && row !== document.body) {
+                    const txt = getText(row);
+                    const r = row.getBoundingClientRect();
+                    const looksLikeRecentRow =
+                        txt.includes('недавно') &&
+                        (txt.includes('переношу') || txt.includes('быстрые ответы') || txt.includes('ответы') || txt.includes('вашу тему')) &&
+                        r.height <= 90;
+
+                    if (looksLikeRecentRow) {
+                        best = row;
+                        break;
+                    }
+                    row = row.parentElement;
+                }
+
+                const target = best || label.parentElement;
+                if (target && !target.classList.contains('br-status-line')) {
+                    target.classList.add('br-force-hide-recent');
+                    target.style.setProperty('display', 'none', 'important');
                 }
             });
         } catch (e) {
             console.error('[BR Script] Hide recent row error:', e);
         }
     }
-
     function ensureStatusLine() {
         const replyBtn = getMainReplyButton();
         if (!replyBtn.length) return $();
