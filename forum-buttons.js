@@ -1,5 +1,30 @@
 (function () {
     'use strict';
+
+    const BR_SCRIPT_VERSION = '2026-06-10-fix-2';
+    const BR_SCRIPT_UPDATE_KEY = 'br_script_seen_version';
+
+    (function showScriptUpdateNotice() {
+        try {
+            const seen = localStorage.getItem(BR_SCRIPT_UPDATE_KEY);
+            if (seen === BR_SCRIPT_VERSION) return;
+
+            localStorage.setItem(BR_SCRIPT_UPDATE_KEY, BR_SCRIPT_VERSION);
+
+            setTimeout(() => {
+                alert(
+                    'Обновление BR Script\n\n' +
+                    'Что изменено:\n' +
+                    '• Исправлено отображение кнопок в одну строку\n' +
+                    '• Исправлен баг с попаданием кнопок в "Недавние"\n' +
+                    '• Добавлено уведомление об обновлении скрипта\n\n' +
+                    'Версия: ' + BR_SCRIPT_VERSION
+                );
+            }, 1200);
+        } catch (e) {
+            console.error('[BR Script] Update notice error:', e);
+        }
+    })();
     try {
         (function () {
             const STORAGE_KEY = 'br_panel_servers_final_v5';
