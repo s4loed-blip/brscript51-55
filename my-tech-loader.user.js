@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         My Tech Script Loader
 // @namespace    https://github.com/s4loed-blip/brscript51-55
-// @version      0.2.2
+// @version      0.3.0
 // @description  Для работы отдела 41-45 / 51-55
 // @author       tech51
 // @match        https://forum.blackrussia.online/*
@@ -21,31 +21,48 @@
         sourceUrl: 'https://raw.githubusercontent.com/s4loed-blip/brscript51-55/main/forum-buttons.js',
         timeoutMs: 10000,
         retries: 3,
-        retryDelayMs: 1200,
-        cacheKey: 'my_tech_script_cache_v2',
-        oldCacheKey: 'my_tech_script_cache',
+        retryDelayMs: 900,
+        cacheKey: 'my_tech_script_cache_v3',
+        oldCacheKeys: ['my_tech_script_cache_v2', 'my_tech_script_cache'],
+        reloadKey: 'my_tech_loader_last_forced_reload_build',
         debug: false,
-        build: 'loader-0.2.2-click-guard-v11-20260610-2310'
+        build: 'loader-0.3.0-build-aware-20260611-001'
     };
 
     const pageWindow = typeof unsafeWindow !== 'undefined' ? unsafeWindow : window;
     const log = (...args) => CONFIG.debug && console.log('[My Tech Loader]', ...args);
 
     let alreadyRan = false;
+    let runningBuild = null;
+    let runningCode = null;
+    let cacheFallbackTimer = null;
+
+    function normalizeCache(raw) {
+        if (!raw) return null;
+        if (typeof raw === 'string') return { code: raw, buildId: extractBuildId(raw), savedAt: 0 };
+        if (raw.code) return { code: raw.code, buildId: raw.buildId || extractBuildId(raw.code), savedAt: raw.savedAt || 0 };
+        return null;
+    }
 
     function getCache() {
         try {
-            return GM_getValue(CONFIG.cacheKey) || GM_getValue(CONFIG.oldCacheKey) || null;
-        } catch (e) {
-            return null;
-        }
+            const main = normalizeCache(GM_getValue(CONFIG.cacheKey));
+            if (main && !looksBad(main.code)) return main;
+            for (const key of CONFIG.oldCacheKeys) {
+                const old = normalizeCache(GM_getValue(key));
+                if (old && !looksBad(old.code)) return old;
+            }
+        } catch (e) {}
+        return null;
     }
 
     function setCache(code) {
         try {
             GM_setValue(CONFIG.cacheKey, {
                 savedAt: Date.now(),
-                build: CONFIG.build,
+                loaderBuild: CONFIG.build,
+                buildId: extractBuildId(code),
+                version: extractVersion(code),
                 code
             });
         } catch (e) {}
@@ -80,25 +97,38 @@
     }
 
     function looksBad(code) {
-        return !code || !String(code).trim() || String(code).includes('My Tech Script Loader');
+        const s = String(code || '');
+        return !s.trim() || s.includes('My Tech Script Loader') || !s.includes('BR_SCRIPT_BUILD_ID');
+    }
+
+    function extractBuildId(code) {
+        const m = String(code || '').match(/BR_SCRIPT_BUILD_ID\s*=\s*['"]([^'"]+)['"]/);
+        return m ? m[1] : null;
+    }
+
+    function extractVersion(code) {
+        const m = String(code || '').match(/BR_SCRIPT_VERSION\s*=\s*['"]([^'"]+)['"]/);
+        return m ? m[1] : null;
     }
 
     function runInPage(code, reason) {
         if (alreadyRan || looksBad(code)) return false;
         alreadyRan = true;
+        runningCode = code;
+        runningBuild = extractBuildId(code);
 
         const script = document.createElement('script');
         script.textContent = `${code}\n//# sourceURL=brscript-forum-buttons-${reason}.js`;
         (document.head || document.documentElement).appendChild(script);
         script.remove();
-        log('ran', reason);
+        log('ran', reason, runningBuild);
         return true;
     }
 
     async function fetchSource(attempt = 1) {
         try {
             const separator = CONFIG.sourceUrl.includes('?') ? '&' : '?';
-            const freshUrl = `${CONFIG.sourceUrl}${separator}v=${Date.now()}&loader=${encodeURIComponent(CONFIG.build)}`;
+            const freshUrl = `${CONFIG.sourceUrl}${separator}t=${Date.now()}&loader=${encodeURIComponent(CONFIG.build)}`;
 
             const response = await Promise.race([
                 fetch(freshUrl, { cache: 'no-store' }),
@@ -119,26 +149,53 @@
         }
     }
 
+    function forceReloadForFreshBuild(freshBuild) {
+        if (!freshBuild || freshBuild === runningBuild) return;
+        try {
+            const lastReloaded = GM_getValue(CONFIG.reloadKey);
+            if (lastReloaded === freshBuild) return;
+            GM_setValue(CONFIG.reloadKey, freshBuild);
+        } catch (e) {}
+        setTimeout(() => pageWindow.location.reload(), 250);
+    }
+
     async function main() {
         await waitForDocumentElement();
 
         const cached = getCache();
-        const cachedCode = cached && cached.code ? cached.code : cached;
 
-        if (cachedCode && !looksBad(cachedCode)) {
-            waitForPageJquery(8000).then(() => runInPage(cachedCode, 'cache'));
+        if (cached && cached.code && !looksBad(cached.code)) {
+            cacheFallbackTimer = setTimeout(() => {
+                waitForPageJquery(8000).then(() => runInPage(cached.code, 'cache'));
+            }, 350);
         }
 
         try {
             const freshCode = await fetchSource();
+            const freshBuild = extractBuildId(freshCode);
             setCache(freshCode);
+
+            if (cacheFallbackTimer) {
+                clearTimeout(cacheFallbackTimer);
+                cacheFallbackTimer = null;
+            }
 
             if (!alreadyRan) {
                 await waitForPageJquery(8000);
                 runInPage(freshCode, 'fresh');
+                return;
+            }
+
+            if (freshCode !== runningCode && freshBuild !== runningBuild) {
+                forceReloadForFreshBuild(freshBuild);
             }
         } catch (error) {
             console.error('[My Tech Loader] Не удалось загрузить свежий forum-buttons.js', error);
+            if (!alreadyRan && cached && cached.code && !looksBad(cached.code)) {
+                if (cacheFallbackTimer) clearTimeout(cacheFallbackTimer);
+                await waitForPageJquery(8000);
+                runInPage(cached.code, 'cache-after-fetch-error');
+            }
         }
     }
 

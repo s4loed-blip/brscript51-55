@@ -1,9 +1,9 @@
 (function () {
     'use strict';
 
-    const BR_SCRIPT_VERSION = '2026-06-10-fix-14';
-    const BR_SCRIPT_BUILD_ID = 'br-build-2026-06-10-restore-old-colors-v14-20260611-0001';
-    const BR_SCRIPT_UPDATE_KEY = 'br_script_seen_update_version';
+    const BR_SCRIPT_VERSION = '2026-06-10-fix-15';
+    const BR_SCRIPT_BUILD_ID = 'br-build-2026-06-11-stable-update-build-v15-001';
+    const BR_SCRIPT_UPDATE_KEY = 'br_script_seen_update_build_id';
     const BR_SCRIPT_DOWNLOAD_URL = 'https://raw.githubusercontent.com/s4loed-blip/brscript51-55/main/my-tech-loader.user.js';
 
 
@@ -99,11 +99,11 @@
 
     function showScriptUpdateNotice() {
         try {
-            if (localStorage.getItem(BR_SCRIPT_UPDATE_KEY) === BR_SCRIPT_VERSION) return;
+            if (localStorage.getItem(BR_SCRIPT_UPDATE_KEY) === BR_SCRIPT_BUILD_ID) return;
 
             const renderNotice = () => {
                 if (!document.body) return;
-                if (localStorage.getItem(BR_SCRIPT_UPDATE_KEY) === BR_SCRIPT_VERSION) return;
+                if (localStorage.getItem(BR_SCRIPT_UPDATE_KEY) === BR_SCRIPT_BUILD_ID) return;
 
                 const old = document.querySelector('#br-script-update-notice');
                 if (old) old.remove();
@@ -143,7 +143,7 @@
                             <div class="br-update-icon">⚡</div>
                             <div>
                                 <div class="br-update-title">BR Script обновлён</div>
-                                <div class="br-update-subtitle">Новая сборка готова к установке — обновлён loader</div>
+                                <div class="br-update-subtitle">Новая сборка готова к установке</div>
                             </div>
                         </div>
                         <div class="br-update-body">
@@ -152,21 +152,21 @@
                                 <div><span>✓</span> Кнопки статусов выровнены нормальной строкой</div>
                                 <div><span>✓</span> Блок «Недавно» больше не мешает под формой ответа</div>
                                 <div><span>✓</span> Панель управления теперь запускается быстрее через кэш loader</div>
-                                <div><span>✓</span> Loader обновлён: Tampermonkey больше не должен писать «код такой же»</div>
+                                <div><span>✓</span> Уведомление теперь работает по BUILD_ID, а не по визуальной версии</div>
                             </div>
                         </div>
                         <div class="br-update-actions">
                             <button id="br-script-update-download" class="br-update-download" type="button">Скачать обновление</button>
                             <button id="br-script-update-later" class="br-update-later" type="button">Позже</button>
                         </div>
-                        <div class="br-update-footer">Сначала обнови loader, потом forum-buttons.js. Окно скроется до следующей версии.</div>
+                        <div class="br-update-footer">Нажми «Скачать обновление». Окно появится снова только при новом BUILD_ID.</div>
                     </div>
                 `;
                 document.body.appendChild(overlay);
 
                 const closeOnly = () => overlay.remove();
                 const markDownloaded = () => {
-                    localStorage.setItem(BR_SCRIPT_UPDATE_KEY, BR_SCRIPT_VERSION);
+                    localStorage.setItem(BR_SCRIPT_UPDATE_KEY, BR_SCRIPT_BUILD_ID);
                     window.open(BR_SCRIPT_DOWNLOAD_URL + '?v=' + encodeURIComponent(BR_SCRIPT_VERSION) + '&b=' + encodeURIComponent(BR_SCRIPT_BUILD_ID), '_blank');
                     overlay.remove();
                 };
