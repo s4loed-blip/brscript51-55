@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    const BR_SCRIPT_VERSION = '2026-06-10-fix-7';
+    const BR_SCRIPT_VERSION = '2026-06-10-fix-8';
     const BR_SCRIPT_UPDATE_KEY = 'br_script_seen_update_version';
     const BR_SCRIPT_DOWNLOAD_URL = 'https://raw.githubusercontent.com/s4loed-blip/brscript51-55/main/my-tech-loader.user.js';
 
@@ -114,7 +114,8 @@
                         Что изменено:<br>
                         • Исправлено отображение кнопок в одну строку<br>
                         • Исправлен баг с попаданием кнопок в блок «Недавно»<br>
-                        • Блок «Недавно» скрывается сразу при загрузке страницы<br><br>
+                        • Блок «Недавно» скрывается сразу при загрузке страницы<br>
+                        • Кнопки статусов вынесены в отдельную ровную строку под редактором<br><br>
                         Версия: <b>${BR_SCRIPT_VERSION}</b><br><br>
                         Нажми <b>«Скачать обновление»</b>. После этого окно больше не появится до следующей версии.
                     </div>
@@ -1463,26 +1464,36 @@
 .br-status-line {
     display: flex !important;
     align-items: center !important;
-    flex-wrap: nowrap !important;
-    gap: 8px !important;
-    white-space: nowrap !important;
-    margin-top: 8px !important;
+    justify-content: flex-start !important;
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+    white-space: normal !important;
+    clear: both !important;
+    float: none !important;
     width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    margin: 10px 0 8px 0 !important;
+    padding: 0 !important;
+    position: relative !important;
+    z-index: 2 !important;
 }
 
 .br-status-buttons {
     display: inline-flex !important;
     align-items: center !important;
-    flex-wrap: nowrap !important;
-    gap: 5px !important;
-    white-space: nowrap !important;
+    justify-content: flex-start !important;
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+    white-space: normal !important;
     vertical-align: middle !important;
 }
 
 .br-status-buttons button,
 .br-status-line > button {
     flex: 0 0 auto !important;
-    margin-right: 0 !important;
+    margin: 0 !important;
+    white-space: nowrap !important;
 }
 
 .br-force-hide-recent,
@@ -1617,20 +1628,66 @@
             console.error('[BR Script] Hide recent row error:', e);
         }
     }
-    function ensureStatusLine() {
+    function getQuickReplyScope() {
         const replyBtn = getMainReplyButton();
-        if (!replyBtn.length) return $();
+        const editor = $('.fr-box:visible, .fr-wrapper:visible, .fr-element:visible').last();
+
+        let scope = $();
+
+        if (editor.length) {
+            scope = editor.closest('form, .js-quickReply, .quickReply, .block-container, .message-responseRow, .message-cell').first();
+        }
+
+        if (!scope.length && replyBtn.length) {
+            scope = replyBtn.closest('form, .js-quickReply, .quickReply, .block-container, .message-responseRow, .message-cell').first();
+        }
+
+        if (!scope.length) {
+            scope = $('body');
+        }
+
+        return scope;
+    }
+
+    function getStatusInsertAnchor(scope) {
+        const privacy = scope.find('div, p, span').filter(function () {
+            const txt = String($(this).text() || '').replace(/\s+/g, ' ').trim().toLowerCase();
+            return txt.includes('мы не собираем') && txt.includes('персональные данные');
+        }).last();
+
+        if (privacy.length) return privacy;
+
+        const editorBox = scope.find('.fr-box:visible').last();
+        if (editorBox.length) return editorBox;
+
+        const editorWrapper = scope.find('.fr-wrapper:visible, .fr-element:visible').last();
+        if (editorWrapper.length) return editorWrapper;
+
+        const replyBtn = getMainReplyButton();
+        if (replyBtn.length) return replyBtn.parent();
+
+        return $();
+    }
+
+    function ensureStatusLine() {
+        const scope = getQuickReplyScope();
+        const anchor = getStatusInsertAnchor(scope);
+        if (!anchor.length) return $();
 
         let line = $('.br-status-line').first();
         if (!line.length) {
             line = $('<div class="br-status-line"></div>');
-            replyBtn.before(line);
+        }
+
+        // Если линия случайно попала в ряд штатных кнопок — переносим её под редактор.
+        if (!line.parent().length || !line.prev().is(anchor)) {
+            anchor.after(line);
         }
 
         let wrap = line.find('.br-status-buttons').first();
         if (!wrap.length) {
             wrap = $('<span class="br-status-buttons"></span>');
-            line.append(wrap);
+            line.prepend(wrap);
         }
 
         if (!line.find('#selectAnswers').length && $('#selectAnswers').length) {
