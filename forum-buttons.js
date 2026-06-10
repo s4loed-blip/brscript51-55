@@ -1,30 +1,29 @@
 (function () {
     'use strict';
 
-    const BR_SCRIPT_VERSION = '2026-06-10-fix-2';
-    const BR_SCRIPT_UPDATE_KEY = 'br_script_seen_version';
+    const BR_SCRIPT_VERSION = '2026-06-10-fix-3';
 
-    (function showScriptUpdateNotice() {
+    function showScriptUpdateNotice() {
         try {
-            const seen = localStorage.getItem(BR_SCRIPT_UPDATE_KEY);
-            if (seen === BR_SCRIPT_VERSION) return;
-
-            localStorage.setItem(BR_SCRIPT_UPDATE_KEY, BR_SCRIPT_VERSION);
-
             setTimeout(() => {
-                alert(
+                const message =
                     'Обновление BR Script\n\n' +
                     'Что изменено:\n' +
                     '• Исправлено отображение кнопок в одну строку\n' +
-                    '• Исправлен баг с попаданием кнопок в "Недавние"\n' +
-                    '• Добавлено уведомление об обновлении скрипта\n\n' +
-                    'Версия: ' + BR_SCRIPT_VERSION
-                );
+                    '• Исправлен баг с попаданием кнопок в блок "Недавно"\n' +
+                    '• Блок "Недавно" теперь скрывается под формой ответа\n\n' +
+                    'Версия: ' + BR_SCRIPT_VERSION;
+
+                if (window.XF && typeof XF.alert === 'function') {
+                    XF.alert(message.replace(/\n/g, '<br>'), 'Обновление BR Script');
+                } else {
+                    alert(message);
+                }
             }, 1200);
         } catch (e) {
             console.error('[BR Script] Update notice error:', e);
         }
-    })();
+    }
     try {
         (function () {
             const STORAGE_KEY = 'br_panel_servers_final_v5';
@@ -1316,10 +1315,25 @@
 	// Загрузка скрипта для обработки шаблонов
 	$('body').append('<script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.js"></script>');
 
+    showScriptUpdateNotice();
+    hideRecentAnswerRow();
+    setTimeout(hideRecentAnswerRow, 800);
+    setTimeout(hideRecentAnswerRow, 2000);
+
     // Фикс расположения кнопок: одна строка + не вставлять в блок "Недавно"
     if (!document.querySelector('#br-status-buttons-fix')) {
         $('head').append(`
 <style id="br-status-buttons-fix">
+.br-status-line {
+    display: flex !important;
+    align-items: center !important;
+    flex-wrap: nowrap !important;
+    gap: 8px !important;
+    white-space: nowrap !important;
+    margin-top: 8px !important;
+    width: 100% !important;
+}
+
 .br-status-buttons {
     display: inline-flex !important;
     align-items: center !important;
@@ -1329,11 +1343,13 @@
     vertical-align: middle !important;
 }
 
-.br-status-buttons button {
+.br-status-buttons button,
+.br-status-line > button {
     flex: 0 0 auto !important;
     margin-right: 0 !important;
 }
 
+.br-force-hide-recent,
 .uix_recentActions .br-status-buttons,
 .uix_recent .br-status-buttons,
 .block-outer .br-status-buttons {
@@ -1391,44 +1407,94 @@
 
 
     function getMainReplyButton() {
-        return $('.button--icon--reply')
-            .filter(function () {
-                return !$(this).closest('.uix_recentActions, .uix_recent, .block-outer, .br-status-buttons').length;
-            })
-            .first();
+        const candidates = $('.button--icon--reply').filter(function () {
+            const $el = $(this);
+            const text = String($el.text() || '').replace(/\s+/g, ' ').trim().toLowerCase();
+
+            if ($el.closest('.br-status-line, .br-status-buttons, .br-force-hide-recent').length) return false;
+            if ($el.closest('.uix_recentActions, .uix_recent, .block-outer, .menu, .menu-content').length) return false;
+            if (text && !text.includes('ответ')) return false;
+
+            return $el.is(':visible');
+        });
+
+        return candidates.last();
     }
 
-    function ensureStatusWrap() {
+    function hideRecentAnswerRow() {
+        try {
+            $('body *').each(function () {
+                const el = this;
+                const $el = $(el);
+
+                if ($el.closest('.br-status-line, .br-status-buttons, .fr-box, .fr-toolbar, .fr-element, .fr-wrapper').length) return;
+
+                const ownText = String(el.textContent || '').replace(/\s+/g, ' ').trim().toLowerCase();
+                if (!ownText.includes('недавно')) return;
+
+                const hasQuickAnswer = ownText.includes('переношу') || ownText.includes('вашу тему') || ownText.includes('ответы') || ownText.includes('быстрые ответы');
+                if (!hasQuickAnswer) return;
+
+                const row = $el.closest('.formButtonGroup, .block-row, .message-responseRow, .message-cell, .js-quickReply, div').first();
+                if (row.length && !row.hasClass('br-status-line')) {
+                    row.addClass('br-force-hide-recent');
+                }
+            });
+        } catch (e) {
+            console.error('[BR Script] Hide recent row error:', e);
+        }
+    }
+
+    function ensureStatusLine() {
         const replyBtn = getMainReplyButton();
         if (!replyBtn.length) return $();
 
-        let wrap = $('.br-status-buttons').first();
-        if (!wrap.length) {
-            wrap = $('<span class="br-status-buttons"></span>');
-            replyBtn.before(wrap);
+        let line = $('.br-status-line').first();
+        if (!line.length) {
+            line = $('<div class="br-status-line"></div>');
+            replyBtn.before(line);
         }
 
-        return wrap;
+        let wrap = line.find('.br-status-buttons').first();
+        if (!wrap.length) {
+            wrap = $('<span class="br-status-buttons"></span>');
+            line.append(wrap);
+        }
+
+        if (!line.find('#selectAnswers').length && $('#selectAnswers').length) {
+            line.append($('#selectAnswers'));
+        }
+
+        return line;
     }
 
-    function addButton(name, id, hex = "grey") {
+    function ensureStatusWrap() {
+        const line = ensureStatusLine();
+        if (!line.length) return $();
+        return line.find('.br-status-buttons').first();
+    }
+
+    function addButton(name, id, style = "") {
         if ($(`#${id}`).length) return;
 
         const wrap = ensureStatusWrap();
         if (!wrap.length) return;
 
         wrap.append(
-            `<button type="button" class="button--primary button rippleButton" id="${id}" style="border-radius: 25px; margin-right: 5px; background-color: ${hex}">${name}</button>`
+            `<button type="button" class="button--primary button rippleButton" id="${id}" style="background: transparent; ${style}">${name}</button>`
         );
     }
 
     function addAnswers() {
-        if ($('#selectAnswers').length) return;
+        if ($('#selectAnswers').length) {
+            ensureStatusLine();
+            return;
+        }
 
-        const replyBtn = getMainReplyButton();
-        if (!replyBtn.length) return;
+        const line = ensureStatusLine();
+        if (!line.length) return;
 
-        replyBtn.after(
+        line.append(
             `<button type="button" class="button--cta uix_quickReply--button button button--icon button--icon--write rippleButton" id="selectAnswers" style="oswald: 3px; margin-left: 5px; margin-top: 1px; border-radius: 13px; background-color: #FF4500; border-color: #E6E6FA">Ответы</button>`
         );
     }
