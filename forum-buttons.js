@@ -1,8 +1,8 @@
 (function () {
     'use strict';
 
-    const BR_SCRIPT_VERSION = '2026-06-10-fix-15';
-    const BR_SCRIPT_BUILD_ID = 'br-build-2026-06-11-stable-update-build-v15-001';
+    const BR_SCRIPT_VERSION = '2026-06-11-fix-16';
+    const BR_SCRIPT_BUILD_ID = 'br-build-2026-06-11-neutral-ui-v16-001';
     const BR_SCRIPT_UPDATE_KEY = 'br_script_seen_update_build_id';
     const BR_SCRIPT_DOWNLOAD_URL = 'https://raw.githubusercontent.com/s4loed-blip/brscript51-55/main/my-tech-loader.user.js';
 
@@ -115,20 +115,20 @@
                 style.id = 'br-update-style';
                 style.textContent = `
                     #br-script-update-notice{position:fixed!important;inset:0!important;display:flex!important;align-items:center!important;justify-content:center!important;background:rgba(0,0,0,.46)!important;backdrop-filter:blur(3px)!important;z-index:2147483647!important;font-family:Arial,sans-serif!important}
-                    #br-script-update-notice .br-update-card{position:relative!important;width:440px!important;max-width:calc(100vw - 28px)!important;padding:18px!important;border-radius:18px!important;background:linear-gradient(145deg,#252a31 0%,#171a1f 100%)!important;border:1px solid rgba(255,255,255,.12)!important;box-shadow:0 24px 70px rgba(0,0,0,.75),0 0 0 1px rgba(255,69,0,.18) inset!important;color:#fff!important;overflow:hidden!important}
-                    #br-script-update-notice .br-update-card:before{content:''!important;position:absolute!important;left:-80px!important;top:-80px!important;width:220px!important;height:220px!important;background:radial-gradient(circle,rgba(255,69,0,.42),transparent 65%)!important;pointer-events:none!important}
+                    #br-script-update-notice .br-update-card{position:relative!important;width:440px!important;max-width:calc(100vw - 28px)!important;padding:18px!important;border-radius:18px!important;background:linear-gradient(145deg,#252a31 0%,#171a1f 100%)!important;border:1px solid rgba(255,255,255,.12)!important;box-shadow:0 18px 45px rgba(0,0,0,.65)!important;color:#fff!important;overflow:hidden!important}
+                    #br-script-update-notice .br-update-card:before{content:''!important;position:absolute!important;left:-80px!important;top:-80px!important;width:220px!important;height:220px!important;background:radial-gradient(circle,rgba(255,255,255,.08),transparent 65%)!important;pointer-events:none!important}
                     #br-script-update-notice .br-update-close{position:absolute!important;right:12px!important;top:10px!important;width:30px!important;height:30px!important;border-radius:10px!important;border:1px solid rgba(255,255,255,.16)!important;background:rgba(255,255,255,.06)!important;color:#fff!important;font-size:21px!important;line-height:25px!important;cursor:pointer!important}
                     #br-script-update-notice .br-update-head{position:relative!important;display:flex!important;gap:12px!important;align-items:center!important;margin-bottom:16px!important}
-                    #br-script-update-notice .br-update-icon{width:46px!important;height:46px!important;display:flex!important;align-items:center!important;justify-content:center!important;border-radius:15px!important;background:linear-gradient(135deg,#ff4500,#f59e0b)!important;box-shadow:0 0 24px rgba(255,69,0,.45)!important;font-size:24px!important}
+                    #br-script-update-notice .br-update-icon{width:46px!important;height:46px!important;display:flex!important;align-items:center!important;justify-content:center!important;border-radius:15px!important;background:rgba(255,255,255,.08)!important;box-shadow:none!important;font-size:24px!important}
                     #br-script-update-notice .br-update-title{font-size:20px!important;line-height:1.15!important;font-weight:900!important;letter-spacing:.2px!important}
                     #br-script-update-notice .br-update-subtitle{margin-top:3px!important;font-size:12px!important;color:#b8c0cc!important;font-weight:700!important}
                     #br-script-update-notice .br-update-body{position:relative!important;padding:13px!important;border-radius:14px!important;background:rgba(255,255,255,.055)!important;border:1px solid rgba(255,255,255,.08)!important}
-                    #br-script-update-notice .br-update-badge{display:inline-flex!important;padding:4px 9px!important;margin-bottom:9px!important;border-radius:999px!important;background:rgba(34,197,94,.15)!important;color:#86efac!important;border:1px solid rgba(34,197,94,.28)!important;font-size:11px!important;font-weight:900!important;text-transform:uppercase!important}
+                    #br-script-update-notice .br-update-badge{display:inline-flex!important;padding:4px 9px!important;margin-bottom:9px!important;border-radius:999px!important;background:rgba(255,255,255,.07)!important;color:#d7d7d7!important;border:1px solid rgba(255,255,255,.12)!important;font-size:11px!important;font-weight:900!important;text-transform:uppercase!important}
                     #br-script-update-notice .br-update-list{display:grid!important;gap:7px!important;font-size:13px!important;line-height:1.35!important;color:#e5e7eb!important;font-weight:700!important}
-                    #br-script-update-notice .br-update-list span{color:#22c55e!important;font-weight:900!important;margin-right:6px!important}
+                    #br-script-update-notice .br-update-list span{color:#d7d7d7!important;font-weight:900!important;margin-right:6px!important}
                     #br-script-update-notice .br-update-actions{display:flex!important;gap:9px!important;margin-top:15px!important}
                     #br-script-update-notice .br-update-download,#br-script-update-notice .br-update-later{height:38px!important;padding:0 14px!important;border-radius:12px!important;font-weight:900!important;cursor:pointer!important}
-                    #br-script-update-notice .br-update-download{flex:1!important;border:0!important;color:#fff!important;background:linear-gradient(135deg,#ff4500,#f97316)!important;box-shadow:0 10px 25px rgba(255,69,0,.25)!important}
+                    #br-script-update-notice .br-update-download{flex:1!important;border:0!important;color:#fff!important;background:rgba(255,255,255,.08)!important;box-shadow:none!important;border:1px solid rgba(255,255,255,.14)!important}
                     #br-script-update-notice .br-update-later{border:1px solid rgba(255,255,255,.16)!important;background:rgba(255,255,255,.06)!important;color:#d1d5db!important}
                     #br-script-update-notice .br-update-footer{margin-top:10px!important;color:#9ca3af!important;font-size:11px!important;font-weight:700!important;text-align:center!important}
                 `;
@@ -656,7 +656,7 @@
                     }
 
                     .br-menu-dept-title {
-                        color: #fbbf24 !important;
+                        color: #d7d7d7 !important;
                         font-size: 11px !important;
                         font-weight: 800 !important;
                         letter-spacing: 0.3px !important;
@@ -690,13 +690,13 @@
                     }
 
                     .br-menu-server.selected {
-                        background: rgba(37, 99, 235, 0.28) !important;
+                        background: rgba(255,255,255,.10) !important;
                         color: #fff !important;
                     }
 
                     .br-menu-server.selected::before {
                         content: '✓' !important;
-                        color: #60a5fa !important;
+                        color: #d7d7d7 !important;
                         margin-right: 7px !important;
                     }
 
@@ -708,7 +708,7 @@
 
                     .br-menu-divider.small {
                         margin: 7px 0 4px !important;
-                        background: rgba(245,158,11,0.18) !important;
+                        background: rgba(255,255,255,.08) !important;
                     }
 
                     .br-menu-ops {
@@ -718,9 +718,9 @@
                         min-height: 31px !important;
                         padding: 0 8px !important;
                         box-sizing: border-box !important;
-                        background: rgba(245,158,11,0.16) !important;
-                        color: #fbbf24 !important;
-                        border-left: 3px solid #f59e0b !important;
+                        background: rgba(255,255,255,.06) !important;
+                        color: #d7d7d7 !important;
+                        border-left: 3px solid rgba(255,255,255,.14) !important;
                         border-radius: 4px !important;
                         font-size: 12px !important;
                         font-weight: 700 !important;
@@ -728,7 +728,7 @@
                     }
 
                     .br-menu-ops:hover {
-                        background: rgba(245,158,11,0.28) !important;
+                        background: rgba(255,255,255,.10) !important;
                         color: #fff !important;
                         text-decoration: none !important;
                     }
@@ -936,7 +936,7 @@
 
 {
   title: 'ᅠ ᅠ ᅠ ᅠ ᅠ ᅠ ᅠ ᅠ ᅠ  ᅠᅠ ᅠ ЖАЛОБЫ НА ТЕХ. СПЕЦОВ ᅠ ᅠ ᅠᅠ ᅠ ᅠ ᅠ ᅠᅠ ᅠ ᅠ ᅠ ᅠ  ᅠ ',
-  dpstyle: 'oswald: 3px;     color: #fff; background: #db2309; box-shadow: 0 0 2px 0 rgba(0,0,0,0.14),0 2px 2px 0 rgba(0,0,0,0.12),0 1px 3px 0 rgba(0,0,0,0.2); border: none; border-color: #f53317',
+  dpstyle: 'oswald: 3px; color:#d7d7d7; background:rgba(255,255,255,.06); box-shadow:none; border:1px solid rgba(255,255,255,.12)',
     },
 
 {
@@ -1042,7 +1042,7 @@
 },
 	{
   title: ' ᅠ ᅠ ᅠ ᅠ ᅠ ᅠ ᅠ ᅠ ᅠ ᅠ ᅠ ᅠᅠ ᅠ Технический раздел ᅠ ᅠ ᅠᅠ ᅠ ᅠ ᅠ ᅠᅠ  ᅠ ᅠ ᅠ ᅠ ᅠ  ᅠ ᅠ ',
-  dpstyle: 'oswald: 3px;     color: #fff; background: #db2309; box-shadow: 0 0 2px 0 rgba(0,0,0,0.14),0 2px 2px 0 rgba(0,0,0,0.12),0 1px 3px 0 rgba(0,0,0,0.2); border: none; border-color: #f53317',
+  dpstyle: 'oswald: 3px; color:#d7d7d7; background:rgba(255,255,255,.06); box-shadow:none; border:1px solid rgba(255,255,255,.12)',
     },
 {
 	title: 'Форма подачи ТР',
@@ -1473,7 +1473,7 @@
 
 {
   title: 'ᅠ ᅠ ᅠ ᅠ ᅠ ᅠ ᅠ ᅠ ᅠ ᅠ ᅠ ᅠᅠ ᅠ ЖАЛОБЫ НА ИГРОКОВ ᅠ ᅠ ᅠᅠ ᅠ ᅠ ᅠ ᅠᅠ ᅠ ᅠ ᅠ ᅠ ᅠ ᅠ ᅠ     ',
-  dpstyle: 'oswald: 3px;     color: #fff; background: #db2309; box-shadow: 0 0 2px 0 rgba(0,0,0,0.14),0 2px 2px 0 rgba(0,0,0,0.12),0 1px 3px 0 rgba(0,0,0,0.2); border: none; border-color: #f53317',
+  dpstyle: 'oswald: 3px; color:#d7d7d7; background:rgba(255,255,255,.06); box-shadow:none; border:1px solid rgba(255,255,255,.12)',
     },
 {
 	title: 'Игрок будет заблокирован',
@@ -1589,20 +1589,20 @@
 #brs51-status-panel .brs51-answer-main:hover,
 .br-answer-list .brs51-answer-choice:hover,
 .br-task-list .brs51-task-choice:hover {
-    filter: brightness(1.12) !important;
+    background: rgba(255,255,255,.10) !important;
 }
 .br-answer-list .brs51-answer-choice,
 .br-task-list .brs51-task-choice {
     margin: 4px !important;
     border-radius: 13px !important;
-    background: #222831 !important;
-    border: 1px solid #E6E6FA !important;
+    background: rgba(255,255,255,.06) !important;
+    border: 1px solid rgba(255,255,255,.14) !important;
 }
 #brs51-status-panel .brs51-answer-main {
     margin-left: 6px !important;
     border-radius: 13px !important;
-    background-color: #FF4500 !important;
-    border: 1px solid #E6E6FA !important;
+    background: rgba(255,255,255,.06) !important;
+    border: 1px solid rgba(255,255,255,.14) !important;
 }
 </style>
         `);
@@ -1623,14 +1623,14 @@
 
 
 	// Добавление кнопок при загрузке страницы
-	addButton('На рассмотрение', 'brs51-pin', 'border-radius: 20px; margin-right: 11px; border: 2px solid; border-color: rgb(255, 165, 0);');
-	addButton('КП', 'brs51-teamProject', 'border-radius: 20px; margin-right: 100px; border: 2px solid; border-color: rgb(255, 255, 0);');
-	addButton('Рассмотрено', 'brs51-watched', 'border-radius: 13px; margin-right: 5px; border: 2px solid; border-color: rgb(0, 255, 0);');
-	addButton('Отказано', 'brs51-unaccept', 'border-radius: 13px; margin-right: 5px; border: 2px solid; border-color: rgb(255, 0, 0);');
-	addButton('Решено', 'brs51-decided', 'border-radius: 13px; margin-right: 5px; border: 2px solid; border-color: rgb(0, 255, 0);');
-	addButton('Закрыто', 'brs51-closed', 'border-radius: 13px; margin-right: 5px; border: 2px solid; border-color: rgb(255, 0, 0);');
-	addButton('Тех. спецу', 'brs51-techspec', 'border-radius: 13px; margin-right: 5px; border: 2px solid; border-color: rgb(0, 0, 255);');
-  addButton('Одобрено', 'brs51-odobreno', 'border-radius: 13px; margin-right: 5px; border: 2px solid; border-color: rgb(128, 255, 128);');
+	addButton('На рассмотрение', 'brs51-pin', 'border-radius: 13px; margin-right: 5px; border: 1px solid rgba(255,255,255,.14); color: #d7d7d7;');
+	addButton('КП', 'brs51-teamProject', 'border-radius: 13px; margin-right: 5px; border: 1px solid rgba(255,255,255,.14); color: #d7d7d7;');
+	addButton('Рассмотрено', 'brs51-watched', 'border-radius: 13px; margin-right: 5px; border: 1px solid rgba(255,255,255,.14); color: #d7d7d7;');
+	addButton('Отказано', 'brs51-unaccept', 'border-radius: 13px; margin-right: 5px; border: 1px solid rgba(255,255,255,.14); color: #d7d7d7;');
+	addButton('Решено', 'brs51-decided', 'border-radius: 13px; margin-right: 5px; border: 1px solid rgba(255,255,255,.14); color: #d7d7d7;');
+	addButton('Закрыто', 'brs51-closed', 'border-radius: 13px; margin-right: 5px; border: 1px solid rgba(255,255,255,.14); color: #d7d7d7;');
+	addButton('Тех. спецу', 'brs51-techspec', 'border-radius: 13px; margin-right: 5px; border: 1px solid rgba(255,255,255,.14); color: #d7d7d7;');
+  addButton('Одобрено', 'brs51-odobreno', 'border-radius: 13px; margin-right: 5px; border: 1px solid rgba(255,255,255,.14); color: #d7d7d7;');
 	addAnswers();
 
 	// Поиск информации о теме
@@ -1955,7 +1955,7 @@
         if (!line.length) return;
 
         line.append(
-            `<button type="button" class="brs51-answer-main" data-brs51-button="1" id="brs51-select-answers" style="oswald: 3px; margin-left: 5px; margin-top: 1px; border-radius: 13px; background-color: #FF4500; border-color: #E6E6FA">Ответы</button>`
+            `<button type="button" class="brs51-answer-main" data-brs51-button="1" id="brs51-select-answers" style="oswald: 3px; margin-left: 5px; margin-top: 1px; border-radius: 13px; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.14); color: #d7d7d7">Ответы</button>`
         );
     }
 
@@ -1976,7 +1976,7 @@
     function tasksMarkup(buttons) {
         return `<div class="select_answer br-task-list">${buttons
             .map((btn, i) =>
-                `<button type="button" data-task-id="${i}" class="brs51-task-choice br-task-choice" style="margin:5px; border-radius: 13px; margin-right: 5px; border: 1px solid; border-color: #E6E6FA; background-color: ${btn.color || "#000000"}"><span class="button-text">${btn.title}</span></button>`,
+                `<button type="button" data-task-id="${i}" class="brs51-task-choice br-task-choice" style="margin:5px; border-radius: 13px; margin-right: 5px; border: 1px solid; border-color: rgba(255,255,255,.14); background: rgba(255,255,255,.06); color: #d7d7d7"><span class="button-text">${btn.title}</span></button>`,
             )
             .join('')}</div>`;
     }
