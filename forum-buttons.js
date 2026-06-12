@@ -1326,7 +1326,7 @@
   '[CENTER][B][COLOR=rgb(255, 255, 255)]В том случае, если у вас произошла одна из указанных проблем:[/COLOR][/B][/CENTER]<br>' +
   '[CENTER][COLOR=rgb(255, 255, 255)][FONT=verdana]1. Баланс доната (BC) стал отрицательным.<br> 2. Донат не был зачислен на аккаунт.<br> 3. Донат был зачислен не в полном объеме.<br> 4. Отсутствие подарка при подключении или продлении тарифа Tele-2.<br> 5. Частые переподключения к серверу.[/FONT][/COLOR][/CENTER]<br><br>' +
   '[CENTER][B][COLOR=rgb(255, 255, 255)][FONT=verdana]Вам в срочном порядке необходимо  обратиться в техническую поддержку проекта BLACK RUSSIA через официальный сайт .[/FONT][/COLOR][/B][/CENTER]<br>' +
-  '[CENTER][B][COLOR=rgb(255, 255, 255)][FONT=verdana][URL='https://blackhubgames.helpshift.com/hc/ru/3-black-russia/contact-us/']"Перейти в техническую поддержку"[/URL]     [/FONT][/COLOR][/B][/CENTER]<br>' +
+  '[CENTER][B][COLOR=rgb(255, 255, 255)][FONT=verdana][URL=https://blackhubgames.helpshift.com/hc/ru/3-black-russia/contact-us/]"Перейти в техническую поддержку"[/URL]     [/FONT][/COLOR][/B][/CENTER]<br>' +
   '[CENTER][img]https://i.postimg.cc/tgD5Xwhj/1618083711121.png[/img][/CENTER]<br>' +
   '[CENTER][B][I][FONT=verdana][COLOR=rgb(255, 0, 0)]Закрыто[/COLOR][/FONT][/I][/B][CENTER]',
 	prefix: CLOSE_PREFIX,
