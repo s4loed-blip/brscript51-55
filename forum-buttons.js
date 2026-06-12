@@ -869,10 +869,10 @@
 },
 {
 	title: 'Актуальный Nick',
-	content:
-	"[CENTER][COLOR=rgb(209, 213, 216)][FONT=Verdana][SIZE=15px][CENTER]{{ greeting }}, уважаемый [/COLOR][COLOR=rgb(255, 204, 0)]{{ user.name }}[/COLOR].[/CENTER][/CENTER]<br><br>" +
-	"[CENTER]Ваш актуальный Nick_Name - (никнейм)[/CENTER]" + 
-	'[B][I][FONT=verdana][COLOR=rgb(255, 0, 0)]Закрыто[/COLOR][/FONT][/I][/B]',
+content:
+    "[CENTER][COLOR=rgb(209, 213, 216)][FONT=Verdana][SIZE=15px][CENTER]{{ greeting }}, уважаемый [/COLOR][COLOR=rgb(255, 204, 0)]{{ user.name }}[/COLOR].[/CENTER][/CENTER]<br><br>" +
+    "[CENTER]Ваш актуальный Nick_Name - (никнейм)[/CENTER]<br><br>" +
+    "[CENTER][B][I][FONT=verdana][COLOR=rgb(255, 0, 0)]Закрыто[/COLOR][/FONT][/I][/B][/CENTER]",
 },
 {
   title: 'Покупка ИВ у бота',
